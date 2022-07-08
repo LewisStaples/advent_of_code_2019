@@ -5,12 +5,9 @@ def calc_fuel(mass_str):
     mass = int(mass_str)
     fuel = int(mass / 3) - 2
 
-    print(f'mass: {mass}, fuel: {fuel}')
-
     if fuel > 0:
         fuel += calc_fuel(fuel)
     
-    print(f'mass: {mass}, fuel: {fuel}')
     if fuel < 0:
         fuel = 0
     return fuel
@@ -18,13 +15,14 @@ def calc_fuel(mass_str):
 total_fuel = 0
 
 # Reading input from the input file
-input_filename='input.txt'
+input_filename='input_sample1.txt'
 print(f'\nUsing input file: {input_filename}\n')
 with open(input_filename) as f:
     # Pull in each line from the input file
     for in_string in f:
         in_string = in_string.rstrip()
-        total_fuel += calc_fuel(in_string)
-        print('\n')
-print(f'Total fuel (answer to Part A) is: {total_fuel}')
+        fuel_this_step = calc_fuel(in_string)
+        total_fuel += fuel_this_step
+        print(f'ship mass:{in_string},  fuel required:{fuel_this_step}')
+print(f'\nTotal fuel (answer to Part B) is: {total_fuel}')
 
