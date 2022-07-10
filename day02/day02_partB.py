@@ -5,14 +5,16 @@ import enum
 import sys
 
 class Intcode_Program:
-    def __init__(self, string_input):
+    def __init__(self, string_input, noun, verb):
         int_code_program_ch = string_input.split(',')
         self.int_code_program = list(map(lambda ch:int(ch), int_code_program_ch))
         self.current_index = 0
 
+        self.noun = noun
+        self.verb = verb
         if input_filename == 'input.txt':
-            self.int_code_program[1] = 12
-            self.int_code_program[2] = 2
+            self.int_code_program[1] = noun
+            self.int_code_program[2] = verb
 
     # For debugging and/or testing
     def return_display(self):
@@ -35,6 +37,7 @@ class Intcode_Program:
         index = self.current_index + rel_position
         for i in range(levels_indirection):
             index = self.int_code_program[index]
+        
         return self.int_code_program[index]
     
     # rel_position and levels_indirection are the same as get_value
@@ -60,22 +63,23 @@ class Intcode_Program:
         self.current_index = len(self.int_code_program)
 
     def parse(self):
-        print(f'Initial: {self.return_display()}')
         while self.current_index < len(self.int_code_program) - 1:
             opcode_function = {1: 'add', 2:'mult', 99:'exit'}
             getattr(self, opcode_function[self.get_value(0,0)])()
-            print(f'Value  : {self.return_display()}')
 
-        print(f'\nThe solution to part A is {self.int_code_program[0]}\n')
-
+        print(f'The result with noun {self.noun} and verb {self.verb} is {self.int_code_program[0]}\n')
+        if self.int_code_program[0] == 19690720:
+            print(f'Match found: the answer to part B is {100 * self.noun + self.verb}\n')
+            sys.exit(0)
 # Reading input from the input file
-input_filename='input_sample1.txt'
+input_filename='input.txt'
 print(f'\nUsing input file: {input_filename}\n')
 with open(input_filename) as f:
     in_string = f.readline().rstrip()
-intcode_program = Intcode_Program(in_string)
-
-intcode_program.parse()
+for noun in range(100):
+    for verb in range(100):
+        intcode_program = Intcode_Program(in_string, noun, verb)
+        intcode_program.parse()
 
 
 
