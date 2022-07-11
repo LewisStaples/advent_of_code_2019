@@ -3,6 +3,8 @@
 
 # This function is expected to work for higher dimensions than two
 # (It hasn't yet been tested in dimensions greater than two)
+
+# This is the distance used in part A
 def calc_manh_dist(intersection):
     ret_val = 0
     for inters in intersection:
@@ -18,22 +20,30 @@ class WirePointSets:
     }
 
     def __init__(self):
-        self.list_of_wire_point_sets = [set(), set()]
+        self.wire_point_data = [dict(), dict()]
 
-    def get_next_point(self):
+    def get_next_point_info(self):
         index = self.direction_to_point_changes[self.segment_direction]['index']
         increment = self.direction_to_point_changes[self.segment_direction]['increment']
         self.current_point[index] += increment
         return tuple(self.current_point)
 
-    def add_segment(self, wire_number, segment, current_point):
+    def add_segment(self, wire_number, segment, current_point, distance_traversed):
         self.segment_direction = segment[0]
         self.current_point = current_point
         segment_length = int(segment[1:])
         for i in range(segment_length):
-            self.list_of_wire_point_sets[wire_number].add(
-                self.get_next_point()
-            )
+            next_point = self.get_next_point_info()
+            distance_traversed[0] += 1
+            if next_point not in self.wire_point_data[wire_number]:
+                self.wire_point_data[wire_number][next_point] = distance_traversed[0]
+
+    # This is the distance used in part B
+    def calc_path_dist(self, intersection):
+        ret_val = 0
+        for wire_i in self.wire_point_data:
+            ret_val += wire_i[intersection]
+        return ret_val
 
 # Reading input from the input file
 input_filename='input.txt'
@@ -46,13 +56,16 @@ with open(input_filename) as f:
     for i, in_string in enumerate(f):
         # Initialize sets
         current_point = [0,0]
+        distance_traversed = [0]
         in_string = in_string.rstrip()
         for segment in in_string.split(','):
-            wirepointsets.add_segment(i, segment, current_point)
+            wirepointsets.add_segment(i, segment, current_point, distance_traversed)
 
-min_manhattan_dist = float('inf')
-for intersection in wirepointsets.list_of_wire_point_sets[0]&wirepointsets.list_of_wire_point_sets[1]:
-    min_manhattan_dist = min(min_manhattan_dist, calc_manh_dist(intersection))
+min_dist_A = float('inf')
+min_dist_B = float('inf')
+for intersection in wirepointsets.wire_point_data[0].keys()&wirepointsets.wire_point_data[1].keys():
+    min_dist_A = min(min_dist_A, calc_manh_dist(intersection))
+    min_dist_B = min(min_dist_B, wirepointsets.calc_path_dist(intersection))
 
-print(f'The answer to part A is {min_manhattan_dist}')
-
+print(f'The answer to part A is {min_dist_A}')
+print(f'The answer to part B is {min_dist_B}')
