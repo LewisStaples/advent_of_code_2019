@@ -1,1 +1,2 @@
 3,3,1105,-1,9,1101,0,0,12,4,12,99,1
+This uses immediate mode with jump_if_true to take an input, and then output 0 if the input was zero or 1 if the input was non-zero

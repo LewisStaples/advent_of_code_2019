@@ -1,1 +1,2 @@
 1101,100,-1,4,0
+Calculate 100 + -1, store the result (99) in position 4

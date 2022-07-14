@@ -1,1 +1,2 @@
 3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9
+This uses position mode to take an input, and then output 0 if the input was zero or 1 if the input was non-zero

@@ -1,8 +1,9 @@
 # adventOfCode 2019 day 02
 # https://adventofcode.com/2019/day/02
 
-# import enum
 import sys
+
+show_details = True
 
 class Intcode_Program:
     def __init__(self, string_input):
@@ -94,28 +95,57 @@ class Intcode_Program:
         else:
             self.current_index += 3
 
+    # opcode 7
+    def less_than(self, parameter_modes):
+        operand1 = self.get_value(1,parameter_modes[2])
+        operand2 = self.get_value(2,parameter_modes[1])
+        new_value = 1 if operand1 < operand2 else 0
+        self.set_value(3, parameter_modes[0], new_value)
+        self.current_index += 4
+
+    # opcode 8
+    def equal_to(self, parameter_modes):
+        operand1 = self.get_value(1,parameter_modes[2])
+        operand2 = self.get_value(2,parameter_modes[1])
+        new_value = 1 if operand1 == operand2 else 0
+        self.set_value(3, parameter_modes[0], new_value)
+        self.current_index += 4
 
     # parameter_modes_dummy is ignored when exiting the program
     def exit(self, parameter_modes_dummy):
         self.current_index = len(self.int_code_program)
 
     def parse(self):
-        # print(f'Initial: {self.return_display()}\n')
+        if show_details:
+            print(f'Initial: {self.return_display()}\n')
         while self.current_index < len(self.int_code_program) - 1:
-            opcode_function = {1: 'add', 2:'mult', 3:'input', 4:'output', 
-            5: 'jump_if_true', 6: 'jump_if_false',
-            99:'exit'}
+            opcode_function = {
+                1: 'add', 2:'mult', 3:'input', 4:'output', 
+                5: 'jump_if_true', 6: 'jump_if_false', 7: 'less_than', 8: 'equal_to',
+                99:'exit'
+            }
             op_instruction_str = str(self.int_code_program[self.current_index])
             opcode = int(op_instruction_str[-2:])
             parameter_modes = op_instruction_str[:-2].zfill(3)
             getattr(self, opcode_function[opcode])(parameter_modes)
-            # print(f'Values  : {self.return_display()}\n')
+            if show_details:
+                print(f'Values  : {self.return_display()}\n')
 
 # Reading input from the input file
-input_filename='input_sample7.txt'
-print(f'\nUsing input file: {input_filename}\n')
+input_filename='input_sample1.txt'
+print(f'\nUsing input file: {input_filename}')
 with open(input_filename) as f:
     in_string = f.readline().rstrip()
+
+    # Print input file info (as long as its small enough to be displayed easily on the screen)
+    if len(in_string) < 41:
+        print(in_string) # file contents
+    if len(in_string) < 200:
+        print(f.readline()) # written description of what the file does
+    print()
+
 intcode_program = Intcode_Program(in_string)
+
+
 
 intcode_program.parse()
