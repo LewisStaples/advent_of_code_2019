@@ -43,16 +43,16 @@ class Intcode_Program:
 
     # opcode 1
     def add(self, parameter_modes):
-        op1 = self.get_value(1,parameter_modes[2])
-        op2 = self.get_value(2,parameter_modes[1])
-        self.set_value(3, parameter_modes[0], op1 + op2)
+        operand1 = self.get_value(1,parameter_modes[2])
+        operand2 = self.get_value(2,parameter_modes[1])
+        self.set_value(3, parameter_modes[0], operand1 + operand2)
         self.current_index += 4
 
     # opcode 2
     def mult(self, parameter_modes):
-        op1 = self.get_value(1,parameter_modes[2])
-        op2 = self.get_value(2,parameter_modes[1])
-        self.set_value(3, parameter_modes[0], op1 * op2)
+        operand1 = self.get_value(1,parameter_modes[2])
+        operand2 = self.get_value(2,parameter_modes[1])
+        self.set_value(3, parameter_modes[0], operand1 * operand2)
         self.current_index += 4
 
     # opcode 3
@@ -78,6 +78,23 @@ class Intcode_Program:
         print(f'The output value is: {output_value}')
         self.current_index += 2
 
+    # opcode 5
+    def jump_if_true(self, parameter_modes):
+        operand = self.get_value(1,parameter_modes[2])
+        if operand != 0:
+            self.current_index = self.get_value(2,parameter_modes[1])
+        else:
+            self.current_index += 3
+
+    # opcode 6
+    def jump_if_false(self, parameter_modes):
+        operand = self.get_value(1,parameter_modes[2])
+        if operand == 0:
+            self.current_index = self.get_value(2,parameter_modes[1])
+        else:
+            self.current_index += 3
+
+
     # parameter_modes_dummy is ignored when exiting the program
     def exit(self, parameter_modes_dummy):
         self.current_index = len(self.int_code_program)
@@ -85,7 +102,9 @@ class Intcode_Program:
     def parse(self):
         # print(f'Initial: {self.return_display()}\n')
         while self.current_index < len(self.int_code_program) - 1:
-            opcode_function = {1: 'add', 2:'mult', 3:'input', 4:'output', 99:'exit'}
+            opcode_function = {1: 'add', 2:'mult', 3:'input', 4:'output', 
+            5: 'jump_if_true', 6: 'jump_if_false',
+            99:'exit'}
             op_instruction_str = str(self.int_code_program[self.current_index])
             opcode = int(op_instruction_str[-2:])
             parameter_modes = op_instruction_str[:-2].zfill(3)
@@ -93,7 +112,7 @@ class Intcode_Program:
             # print(f'Values  : {self.return_display()}\n')
 
 # Reading input from the input file
-input_filename='input.txt'
+input_filename='input_sample7.txt'
 print(f'\nUsing input file: {input_filename}\n')
 with open(input_filename) as f:
     in_string = f.readline().rstrip()
