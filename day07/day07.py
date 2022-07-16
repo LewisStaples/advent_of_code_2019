@@ -2,6 +2,7 @@
 # https://adventofcode.com/2019/day/02
 
 import sys
+import itertools
 
 show_details = False
 
@@ -131,7 +132,7 @@ class Intcode_Program:
         return self.output
 
 # Reading input from the input file
-input_filename='input_sample2.txt'
+input_filename='input.txt'
 print(f'\nUsing input file: {input_filename}')
 with open(input_filename) as f:
     in_string = f.readline().rstrip()
@@ -144,12 +145,21 @@ with open(input_filename) as f:
     print()
 
 
-input1_phase_setting = [1,0,4,3,2]
-input2_ampInputSignal = 0
-print(f'Using input phase settings {input1_phase_setting}, input signal {input2_ampInputSignal}')
-for i in range(5):
-    intcode_program = Intcode_Program(in_string, input1_phase_setting[i],input2_ampInputSignal)
-    input2_ampInputSignal = intcode_program.parse()
-    print(f'output: {input2_ampInputSignal}')
-    dummy = 123
+input1_phase_setting_example = [0,1,2,3,4]
+permutations = list(itertools.permutations(input1_phase_setting_example))
+max_thruster_signal = float('-inf')
+min_thruster_signal = float('inf')
+for input1_phase_setting in permutations:
+    input2_output_ampInputSignal = 0
+    # print(f'Using input phase settings {input1_phase_setting}, input signal {input2_output_ampInputSignal}')
+    for i in range(5):
+        intcode_program = Intcode_Program(in_string, input1_phase_setting[i],input2_output_ampInputSignal)
+        input2_output_ampInputSignal = intcode_program.parse()
+        # print(f'output: {input2_output_ampInputSignal}')
+    # print(f'final output (thruster signal): {input2_output_ampInputSignal}')
+    max_thruster_signal = max(max_thruster_signal, input2_output_ampInputSignal)
+    min_thruster_signal = min(min_thruster_signal, input2_output_ampInputSignal)
+print(f'The maximum thruster signal is: {max_thruster_signal}')
+print(f'The minimum thruster signal is: {min_thruster_signal}')
+
 
