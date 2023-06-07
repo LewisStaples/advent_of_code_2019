@@ -72,13 +72,14 @@ def print_part_b(pixel_dimensions, input_digits):
             this_col_number = this_digit_number % pixel_dimensions[0]
             this_row_number = ( this_digit_number // pixel_dimensions[0] ) % pixel_dimensions[1]
 
-            # If the image pixel is transparent
-            if image[this_col_number][this_row_number] == 2:
-                # Put in the new "color" (white, black, or transparent)
-                image[this_col_number][this_row_number] = this_digit
-            dummy = 123
-
-            pass
+            try:
+                # If the image pixel is transparent
+                if image[this_col_number][this_row_number] == 2:
+                    # Put in the new "color" (white, black, or transparent)
+                    image[this_col_number][this_row_number] = this_digit
+                dummy = 123
+            except IndexError:
+                dummy = 123
 
             # # If this row is full
             # if len(image[-1]) == pixel_dimensions[0]:
@@ -114,7 +115,7 @@ def solve_problem(input_filename):
     print(f'The answer to part A is {answer_a}\n')
     print_part_b(pixel_dimensions, input_digits)
 
-solve_problem('input_sample1.txt')
+solve_problem('input.txt')
 
 
 
