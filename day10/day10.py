@@ -22,9 +22,28 @@ def get_asteroid_points(input_filename):
     print()
 
     return asteroid_points
-    
+
+
+def visible(asteroid, monitoring_station_point):
+    # Need to implement this logic
+    return True
+
+
+def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
+    the_count = 0
+    for asteroid in asteroid_points:
+        if asteroid == monitoring_station_point:
+            continue
+        if visible(asteroid, monitoring_station_point):
+            the_count += 1
+    return the_count
+
 def solve_problem(input_filename):
     asteroid_points = get_asteroid_points(input_filename)
+    max_count_observable_asteroids = 0
+    for monitoring_station_point in asteroid_points:
+        max_count_observable_asteroids = max(max_count_observable_asteroids, get_count_observed_asteroids(asteroid_points, monitoring_station_point))
+    print(f'The max. asteroids visible is {max_count_observable_asteroids}\n')
 
 solve_problem('input_sample0.txt')
 
