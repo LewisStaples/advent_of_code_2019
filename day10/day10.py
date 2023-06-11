@@ -4,7 +4,8 @@
 # https://adventofcode.com/20xy/day/??
 
 
-# POTENTIAL ALTERNATIVE FOR MUTLIPLE LINE INPUT FILES ....
+import math
+
 
 def get_asteroid_points(input_filename):
     asteroid_points = set()
@@ -24,8 +25,21 @@ def get_asteroid_points(input_filename):
     return asteroid_points
 
 
-def visible(asteroid, monitoring_station_point):
-    # Need to implement this logic
+def visible(asteroid, monitoring_station_point, asteroid_points):
+    # Find greatest common factor
+    dx = - asteroid[0] + monitoring_station_point[0]
+    dy = - asteroid[1] + monitoring_station_point[1]
+    the_gcd = math.gcd(abs(dx), abs(dy))
+    d_asteroid = (
+        round(dx / the_gcd) ,
+        round(dy / the_gcd)
+    )
+    for i in range(1, the_gcd):
+        if (
+            asteroid[0] + i * d_asteroid[0], 
+            asteroid[1] + i * d_asteroid[1]
+            ) in asteroid_points:
+            return False
     return True
 
 
@@ -34,7 +48,7 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
     for asteroid in asteroid_points:
         if asteroid == monitoring_station_point:
             continue
-        if visible(asteroid, monitoring_station_point):
+        if visible(asteroid, monitoring_station_point, asteroid_points):
             the_count += 1
     return the_count
 
@@ -45,7 +59,7 @@ def solve_problem(input_filename):
         max_count_observable_asteroids = max(max_count_observable_asteroids, get_count_observed_asteroids(asteroid_points, monitoring_station_point))
     print(f'The max. asteroids visible is {max_count_observable_asteroids}\n')
 
-solve_problem('input_sample0.txt')
+solve_problem('input.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
