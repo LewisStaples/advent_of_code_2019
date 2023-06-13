@@ -52,9 +52,10 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
             the_count += 1
     return the_count
 
-
+# This function is for part 2
 def vaporize_next_asteroid(asteroid_points, laser_angle):
-    # Need to destroy asteroid at laser_angle, if any
+# def vaporize_next_asteroid(asteroid_points, last_vaporized_location):
+    # Need to destroy next asteroid
     pass
 
 
@@ -62,23 +63,37 @@ def solve_problem(input_filename):
     # Code to solve part 1
     asteroid_points = get_asteroid_points(input_filename)
     max_count_observable_asteroids = -1
+    best_monitor_location = None
     for monitoring_station_point in asteroid_points:
         # max_count_observable_asteroids = max(max_count_observable_asteroids, get_count_observed_asteroids(asteroid_points, monitoring_station_point))
         new_asteroid_count = get_count_observed_asteroids(asteroid_points, monitoring_station_point)
         if new_asteroid_count > max_count_observable_asteroids:
             max_count_observable_asteroids = new_asteroid_count
+            best_monitor_location = monitoring_station_point
 
-    print(f'The max. asteroids visible (part 1) is {max_count_observable_asteroids}\n')
-
+    print(f'The max. asteroids visible (part 1) is {max_count_observable_asteroids}')
+    print(f'and the best location to monitor asteroids is at: {best_monitor_location}\n')
     # Code to solve part 2
-    # Initialize angle to point upward
+
+    # Go through all asteroids and determine angle between them and the best monitor location
+    # (later use this to iterate through these angles in order)
     laser_angle = 0
+    # # Force the system to start immediately above it (in the negative y axis)
+    # last_vaporized_location = [
+    #     best_monitor_location[0] - 1,
+    #     0
+    # ]
+
     # for i in range(200):
     for i in range(5): # For testing only
-        vaporize_next_asteroid(asteroid_points, laser_angle)
+        print(f'Vaporized asteroid # {i} at ', end = '')  # Output for testing
+        print()
+
+        laser_angle = vaporize_next_asteroid(asteroid_points, laser_angle)
+        # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
 
 
-solve_problem('input_sample0.txt')
+solve_problem('input_sample1.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
