@@ -76,6 +76,20 @@ def solve_problem(input_filename):
     # Code to solve part 2
 
     # Go through all asteroids and determine angle between them and the best monitor location
+    # Create a new data structure with index:  the angle, and value: list of asteroids at that angle, sorted by distance from monitor locatin
+    asteroids_by_angle = dict()
+    for asteroid in asteroid_points:
+        # Do not do this for the monitor location itself
+        if asteroid == best_monitor_location:
+            continue
+        # Calculate the angle ... PROBLEM 1 TO SOLVE ... atan2, plus account for 0 deltas
+        pass
+        # if angle not in asteroids_by_angle
+        # asteroids_by_angle[the_angle] = list(asteroid)
+        # else:
+        # compute index_to_keep_list_in_order_by_distance  ... PROBLEM 2 TO SOLVE
+        # asteroids_by_angle[the_angle].insert(asteroid, index_to_keep_list_in_order_by_distance)
+
     # (later use this to iterate through these angles in order)
     laser_angle = 0
     # # Force the system to start immediately above it (in the negative y axis)
@@ -93,7 +107,7 @@ def solve_problem(input_filename):
         # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
 
 
-solve_problem('input_sample1.txt')
+solve_problem('input.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
