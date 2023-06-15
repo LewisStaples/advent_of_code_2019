@@ -59,6 +59,12 @@ def vaporize_next_asteroid(asteroid_points, laser_angle):
     pass
 
 
+def get_manh_distance(asteroid, best_monitor_location):
+    return (
+        abs(asteroid[0] - best_monitor_location[0]) + 
+        abs(asteroid[1] - best_monitor_location[1])
+    )
+
 def solve_problem(input_filename):
     # Code to solve part 1
     asteroid_points = get_asteroid_points(input_filename)
@@ -83,12 +89,19 @@ def solve_problem(input_filename):
         if asteroid == best_monitor_location:
             continue
         # Calculate the angle ... PROBLEM 1 TO SOLVE ... atan2, plus account for 0 deltas
-        pass
-        # if angle not in asteroids_by_angle
-        # asteroids_by_angle[the_angle] = list(asteroid)
-        # else:
-        # compute index_to_keep_list_in_order_by_distance  ... PROBLEM 2 TO SOLVE
-        # asteroids_by_angle[the_angle].insert(asteroid, index_to_keep_list_in_order_by_distance)
+        the_angle = math.atan2(
+            asteroid[1] - best_monitor_location[1],
+            asteroid[0] - best_monitor_location[0]
+        )
+
+
+        if the_angle not in asteroids_by_angle:
+            asteroids_by_angle[the_angle] = list(asteroid)
+        else:
+            # compute index_to_keep_list_in_order_by_distance  ... PROBLEM 2 TO SOLVE
+            # ordering by Manhattan distance is adequate!
+            pass
+            # asteroids_by_angle[the_angle].insert(asteroid, index_to_keep_list_in_order_by_distance)
 
     # (later use this to iterate through these angles in order)
     laser_angle = 0
