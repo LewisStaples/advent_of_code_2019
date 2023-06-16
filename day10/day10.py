@@ -53,10 +53,8 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
     return the_count
 
 # This function is for part 2
-def vaporize_next_asteroid(asteroid_points, laser_angle):
-# def vaporize_next_asteroid(asteroid_points, last_vaporized_location):
-    # Need to destroy next asteroid
-    pass
+def vaporize_next_asteroid(asteroids_by_angle, laser_angle):
+    dummy = 123
 
 
 def get_manh_distance(asteroid, best_monitor_location):
@@ -96,11 +94,13 @@ def solve_problem(input_filename):
 
 
         if the_angle not in asteroids_by_angle:
-            asteroids_by_angle[the_angle] = list(asteroid)
+            asteroids_by_angle[the_angle] = {get_manh_distance(asteroid, best_monitor_location):asteroid} # list(asteroid)
         else:
             # compute index_to_keep_list_in_order_by_distance  ... PROBLEM 2 TO SOLVE
             # ordering by Manhattan distance is adequate!
-            pass
+            
+            asteroids_by_angle[the_angle][get_manh_distance(asteroid, best_monitor_location)] = asteroid
+
             # asteroids_by_angle[the_angle].insert(asteroid, index_to_keep_list_in_order_by_distance)
 
     # (later use this to iterate through these angles in order)
@@ -116,11 +116,13 @@ def solve_problem(input_filename):
         print(f'Vaporized asteroid # {i} at ', end = '')  # Output for testing
         print()
 
-        laser_angle = vaporize_next_asteroid(asteroid_points, laser_angle)
+        laser_angle = vaporize_next_asteroid(asteroids_by_angle, laser_angle)
+
+        # laser_angle = vaporize_next_asteroid(asteroid_points, laser_angle)
         # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
 
 
-solve_problem('input.txt')
+solve_problem('input_sample2.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
