@@ -52,10 +52,24 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
             the_count += 1
     return the_count
 
-# # This function is for part 2
-# def vaporize_next_asteroid(asteroids_by_angle, laser_angle):
-#     dummy = 123
+# This function is for part 2
+def vaporize_next_asteroid(asteroids_by_angle, i, angle_list):
+    # Do the vaporization
+    print(f'Vaporizing nearest asteroid in here: {asteroids_by_angle[angle_list[i]]}')
+    # Go to the next element in the list asteroids_by_angle
+    return i + 1
 
+def discover_next_asteroid(asteroids_by_angle, ret_index, angle_list):
+    while True:
+        # Handle element wrap-around in the list asteroids_by_angle
+        if ret_index >= len(angle_list):
+            ret_index = 0
+        # Skip any empty elements (go to the next one)
+        elif len(asteroids_by_angle[angle_list[ret_index]]) == 0:
+            ret_index += 1
+        else:
+            # break
+            return ret_index
 
 def get_manh_distance(asteroid, best_monitor_location):
     return (
@@ -88,13 +102,14 @@ def solve_problem(input_filename):
             continue
         # Calculate the angle ... PROBLEM 1 TO SOLVE ... atan2, plus account for 0 deltas
         the_angle = math.atan2(
-            asteroid[1] - best_monitor_location[1],
-            asteroid[0] - best_monitor_location[0]
+            - asteroid[1] + best_monitor_location[1],
+            + asteroid[0] - best_monitor_location[0],
         )
 
 
         if the_angle not in asteroids_by_angle:
-            asteroids_by_angle[the_angle] = {get_manh_distance(asteroid, best_monitor_location):asteroid} # list(asteroid)
+            asteroids_by_angle[the_angle] = {get_manh_distance(asteroid, best_monitor_location):asteroid} 
+
         else:
             # compute index_to_keep_list_in_order_by_distance  ... PROBLEM 2 TO SOLVE
             # ordering by Manhattan distance is adequate!
@@ -114,23 +129,32 @@ def solve_problem(input_filename):
     angle_list = sorted(list(asteroids_by_angle.keys()))
 
     # Start w/ angle = 0.0 or the smallest positive angle initially pointing to an asteroid
-    i = 0
-    while angle_list[i] < 0.0:
+    i = 0 # len(angle_list) - 1
+    # while angle_list[i] < 0.0:
+    while angle_list[i] < math.atan2(1,0):
         try:
             i += 1
         except IndexError:
             i = 0
-            break
+            # i = len(angle_list) - 1
+            # break
     # laser_angle = angle_list[i]
 
     # for i in range(1, 201):
-    for _ in range(1, 5): # For testing only
-        print(f'Vaporized asteroid # {_} at ', end = '')  # Output for testing
-        print()
-        # laser_angle = vaporize_next_asteroid(asteroids_by_angle, laser_angle)
+    for _ in range(24):
+    # while angle_list[i]
 
-        # laser_angle = vaporize_next_asteroid(asteroid_points, laser_angle)
-        # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
+        print(f'Vaporized asteroid # {_ + 1} at ', end = '')  # Output for testing
+        print()
+        i = discover_next_asteroid(asteroids_by_angle, i, angle_list)
+        i = vaporize_next_asteroid(asteroids_by_angle, i, angle_list)
+    
+    print()
+    
+    # laser_angle = vaporize_next_asteroid(asteroids_by_angle, laser_angle)
+
+    # laser_angle = vaporize_next_asteroid(asteroid_points, laser_angle)
+    # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
 
 
 solve_problem('input_sample2.txt')
