@@ -55,18 +55,22 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
 # This function is for part 2
 def vaporize_next_asteroid(asteroids_by_angle, i, angle_list):
     # Do the vaporization
-    print(f'Vaporizing nearest asteroid in here: {asteroids_by_angle[angle_list[i]]}')
+    print(f'Vaporizing nearest asteroid in here: {asteroids_by_angle[angle_list[i]]}\n')
     # Go to the next element in the list asteroids_by_angle
-    return i + 1
+    # return i + 1
+    return i - 1
 
 def discover_next_asteroid(asteroids_by_angle, ret_index, angle_list):
     while True:
         # Handle element wrap-around in the list asteroids_by_angle
-        if ret_index >= len(angle_list):
-            ret_index = 0
+        # if ret_index >= len(angle_list):
+        #     ret_index = 0
+        if ret_index < 0:
+            ret_index = len(angle_list) - 1
         # Skip any empty elements (go to the next one)
         elif len(asteroids_by_angle[angle_list[ret_index]]) == 0:
-            ret_index += 1
+            # ret_index += 1
+            ret_index -= 1
         else:
             # break
             return ret_index
@@ -130,13 +134,16 @@ def solve_problem(input_filename):
 
     # Start w/ angle = 0.0 or the smallest positive angle initially pointing to an asteroid
     i = 0 # len(angle_list) - 1
+    i = len(angle_list) - 1
     # while angle_list[i] < 0.0:
-    while angle_list[i] < math.atan2(1,0):
+    # while angle_list[i] < math.atan2(1,0):
+    while angle_list[i] > math.atan2(1,0):
         try:
-            i += 1
+            # i += 1
+            i -= 1
         except IndexError:
-            i = 0
-            # i = len(angle_list) - 1
+            # i = 0
+            i = len(angle_list) - 1
             # break
     # laser_angle = angle_list[i]
 
@@ -158,6 +165,8 @@ def solve_problem(input_filename):
 
 
 solve_problem('input_sample2.txt')
+# solve_problem('input.txt')
+
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
