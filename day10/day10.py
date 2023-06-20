@@ -53,11 +53,16 @@ def get_count_observed_asteroids(asteroid_points, monitoring_station_point):
     return the_count
 
 # This function is for part 2
-def vaporize_next_asteroid(asteroids_by_angle, i, angle_list):
+def vaporize_next_asteroid(asteroids_by_angle, i, angle_list, asteroid_number):
     # Do the vaporization
-    print(f'Vaporizing nearest asteroid in here: {asteroids_by_angle[angle_list[i]]}\n')
+    # print(f'Vaporizing nearest asteroid in here: {asteroids_by_angle[angle_list[i]]}\n')
+    i_vaporized_asteroid = min(asteroids_by_angle[angle_list[i]].keys())
+    vaporized_asteroid = asteroids_by_angle[angle_list[i]][i_vaporized_asteroid]
+    # if i == 200:
+    if asteroid_number == 199:
+        print(f'Part 2: Vaporized asteroid at {vaporized_asteroid}, yielding {vaporized_asteroid[0] * 100 + vaporized_asteroid[1]}')
+        # print(f'Part 2: The 200th vaporized asteroid is at {vaporized_asteroid}, yielding {vaporized_asteroid[0] * 100 + vaporized_asteroid[1]}')
     # Go to the next element in the list asteroids_by_angle
-    # return i + 1
     return i - 1
 
 def discover_next_asteroid(asteroids_by_angle, ret_index, angle_list):
@@ -93,8 +98,9 @@ def solve_problem(input_filename):
             max_count_observable_asteroids = new_asteroid_count
             best_monitor_location = monitoring_station_point
 
-    print(f'The max. asteroids visible (part 1) is {max_count_observable_asteroids}')
-    print(f'and the best location to monitor asteroids is at: {best_monitor_location}\n')
+    print(f'The "best" location to monitor asteroids is at: {best_monitor_location}')
+    print(f'Part 1: The max. asteroids visible (part 1) is {max_count_observable_asteroids}')
+
     # Code to solve part 2
 
     # Go through all asteroids and determine angle between them and the best monitor location
@@ -148,13 +154,13 @@ def solve_problem(input_filename):
     # laser_angle = angle_list[i]
 
     # for i in range(1, 201):
-    for _ in range(24):
+    for _ in range(200):
     # while angle_list[i]
-
-        print(f'Vaporized asteroid # {_ + 1} at ', end = '')  # Output for testing
-        print()
+        if _ == 200:
+            print(f'Vaporized asteroid # {_ + 1} at ', end = '')  # Output for testing
+        # print()
         i = discover_next_asteroid(asteroids_by_angle, i, angle_list)
-        i = vaporize_next_asteroid(asteroids_by_angle, i, angle_list)
+        i = vaporize_next_asteroid(asteroids_by_angle, i, angle_list, _)
     
     print()
     
@@ -164,8 +170,8 @@ def solve_problem(input_filename):
     # last_vaporized_location = vaporize_next_asteroid(asteroid_points, last_vaporized_location)
 
 
-solve_problem('input_sample2.txt')
-# solve_problem('input.txt')
+# solve_problem('input_sample1.txt')
+solve_problem('input.txt')
 
 
 # def test_sample_0():
