@@ -4,6 +4,7 @@
 # https://adventofcode.com/2019/day/12
 
 import numpy as np
+import functools
 import itertools
 
 def get_initial_moons(input_filename):
@@ -28,7 +29,6 @@ def get_initial_moons(input_filename):
                     'vel' : np.array([0,0,0])
                  }
             )
-            dummy = 123
     print('END   of initial input\n')
     return initial_moons
 
@@ -55,12 +55,26 @@ def print_status(moon_states, step_num):
         print('s:')
     for moon_state in moon_states:
         print(f'pos={moon_state["pos"]}, vel={moon_state["vel"]}')
+    print(f'Total Energy = {calculate_energy(moon_states)}')
     print()
 
-moon_states = get_initial_moons('input_sample1.txt')
-print_status(moon_states, 0)
-for step_num in range(100):
+def calculate_potential_energy(moon):
+    return functools.reduce(lambda x, y: abs(x) + abs(y), moon['pos'], 0)
+
+
+def calculate_kinetic_energy(moon):
+    return functools.reduce(lambda x, y: abs(x) + abs(y), moon['vel'], 0)
+
+
+def calculate_energy(moon_states):
+    ret_val = 0
+    for moon in moon_states:
+        ret_val += calculate_potential_energy(moon) * calculate_kinetic_energy(moon)
+    return ret_val
+
+moon_states = get_initial_moons('input_sample0.txt')
+for step_num in range(10):
     update_velocities(moon_states)
     update_positions(moon_states)
-    print_status(moon_states, step_num + 1)
-    dummy = 123
+print_status(moon_states, step_num + 1)
+print('END of Part 1\n')
