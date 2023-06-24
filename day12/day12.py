@@ -6,6 +6,8 @@
 import numpy as np
 import functools
 import itertools
+import copy
+import math
 
 def get_initial_moons(input_filename):
     initial_moons = list()
@@ -20,7 +22,6 @@ def get_initial_moons(input_filename):
             print(in_string)
             for assignment in in_string[1:-1].split(', '):
                 coords.append(int(assignment.split('=')[1]))
-            print(f'{coords}')
             np_coords = np.array(coords)
             print(f'{np_coords}\n')
             initial_moons.append(
@@ -45,7 +46,6 @@ def update_velocities(moon_states):
 def update_positions(moon_states):
     for moon_state in moon_states:
         moon_state['pos'] += moon_state['vel']
-        dummy = 123
 
 def print_status(moon_states, step_num):
     print(f'After {step_num} step', end = '')
@@ -73,8 +73,37 @@ def calculate_energy(moon_states):
     return ret_val
 
 moon_states = get_initial_moons('input_sample0.txt')
+moon_states_original = copy.deepcopy(moon_states)
 for step_num in range(10):
     update_velocities(moon_states)
     update_positions(moon_states)
 print_status(moon_states, step_num + 1)
 print('END of Part 1\n')
+
+print('START of Part 2\n')
+moon_states = copy.deepcopy(moon_states_original)
+cycle_counts = list()
+for _ in moon_states:
+    cycle_counts.append(0)
+cycle_count = 0
+while math.prod(cycle_counts) == 0:
+    update_velocities(moon_states)
+    update_positions(moon_states)
+    cycle_count += 1
+    for the_index in range(len(moon_states)):
+        if cycle_counts[the_index] > 0:
+            continue
+        if moon_states[the_index] == moon_states_original[the_index]:
+            cycle_counts[the_index] = cycle_count
+
+dummy = 123
+
+# for moon_state in moon_states:
+#     for the_key in moon_state.keys():
+#         moon_state[the_key] = tuple(moon_state[the_key])
+#     dummy = 123
+# prior_states = list()
+# for i in range(len(moon_states)):
+#     prior_states.append({0:moon_states[i]})
+
+
