@@ -35,19 +35,27 @@ def get_input(input_filename):
             print(in_string)
 
             the_reaction_data = ReactionData(in_string)
-
-            # reactants, products = in_string.split(' => ')
-            # product_quantity_str, product = products.split(' ')
-            # product_quantity = int(product_quantity_str)
-
+            reactions[the_reaction_data.product.chemical] = the_reaction_data
             dummy = 123
 
     print()
     return reactions
-    
-def solve_problem(input_filename):
-    the_input = get_input(input_filename)
 
+# recursive function
+# def take_next_recursive_step(quantity, chemical):
+    # if chemical == 'ORE'
+    #   return quantity of 'ORE'
+    # else:
+    #   return take_next_recursive_step(quantity, chemical)
+
+def get_stepcount(the_reactions):
+    # Start a recursive march through all chemical reaction steps
+    # Start with 1 'FUEL'
+    return 42
+
+def solve_problem(input_filename):
+    the_reactions = get_input(input_filename)
+    stepcount = get_stepcount(the_reactions)
 
 
 solve_problem('input.txt')
