@@ -71,6 +71,15 @@ def get_stepcount(the_reactions, count_reactions_used_in):
         del count_reactions_used_in[the_chemical]
 
         # ADD TO quantity_needed
+        for the_reactant in the_reactions[the_chemical].reactants:
+            the_reactant_quantity = the_reactant.quantity  # NEEDED ... multiple needed quantity_needed[the_chemical] , quantity in the_reactions[the_chemical]
+            if the_reactant.chemical not in quantity_needed:
+                quantity_needed[the_reactant.chemical] = the_reactant_quantity
+            else:
+                quantity_needed[the_reactant.chemical] += the_reactant_quantity
+
+            dummy = 123
+
         # REDUCE count_reactions_used_in
 
         return 42 # Dummy command to prevent infinite loop
