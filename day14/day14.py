@@ -4,41 +4,55 @@
 # https://adventofcode.com/2019/day/14
 
 
-from dataclasses import dataclass
 import math
 
-# @dataclass
+
+# This class stores a chemical and its associated quantity
 class ChemicalAndQuantity:
-    # chemical: str
-    # quantity: int
     def __init__(self, caq_str):
-        quantity_str, self.chemical = caq_str.split(' ')
+        quantity_str, self.chemical = caq_str.split(" ")
         self.quantity = int(quantity_str)
 
-# @dataclass
+
+# This class stores a chemical reaction.
+# It has one ChemicalAndQuantity that is the product.
+# It has reactants, which is a list of ChemicalAndQuantity
+# (each of which is a reactant).
 class ReactionData:
-    # product: ChemicalAndQuantity
-    # reactants: list
     def __init__(self, reaction_str):
         self.reactants = list()
-        reactant_str, product_str = reaction_str.split(' => ')
+        reactant_str, product_str = reaction_str.split(" => ")
         self.product = ChemicalAndQuantity(product_str)
-        for reactant_substr in reactant_str.split(', '):
+        for reactant_substr in reactant_str.split(", "):
             self.reactants.append(ChemicalAndQuantity(reactant_substr))
 
+
+# This function is designed to be called repeatedly when input data is being read.
+# The function fills counts of how many reactions have a chemical as a reactant.
+# (Interesting ... it doesn't protect against any reaction data that lists a
+# reactant more than once for a given reaction)
 def do_reactant_counting(count_reactions_used_in, the_reaction_data):
     for the_reaction in the_reaction_data.reactants:
-        dummy = 123
         if the_reaction.chemical in count_reactions_used_in:
             count_reactions_used_in[the_reaction.chemical] += 1
         else:
             count_reactions_used_in[the_reaction.chemical] = 1
-        dummy = 123
 
+
+# This function reads the input file and returns two data structures
 def get_input(input_filename):
+    # Dictionary where:
+    # the key is the product chemical
+    # the value is the ReactionData
     reactions = dict()
-    count_reactions_used_in = {'FUEL': 0} # dict()
-    print(f'\nUsing input file: {input_filename}\n')
+
+    # Dictionary where:
+    # the key is a chemical
+    # the value found here is the number of reactions
+    # that use that chemical as a reactant
+    count_reactions_used_in = {"FUEL": 0}
+
+    print(f"\nUsing input file: {input_filename}\n")
     with open(input_filename) as f:
         # Pull in each line from the input file
         for in_string in f:
@@ -49,58 +63,49 @@ def get_input(input_filename):
             reactions[the_reaction_data.product.chemical] = the_reaction_data
 
             do_reactant_counting(count_reactions_used_in, the_reaction_data)
-            dummy = 123
 
     print()
     return reactions, count_reactions_used_in
 
-# recursive function
-# def take_next_recursive_step(quantity, chemical):
-    # if chemical == 'ORE'
-    #   return quantity of 'ORE'
-    # else:
-    #   return take_next_recursive_step(quantity, chemical)
 
-def get_stepcount(the_reactions, count_reactions_used_in):
+# This solves Problem One
+# (It determines and returns the quantity of ORE needed to create 1 FUEL)
+def get_ORE_needed(the_reactions, count_reactions_not_yet_analyzed):
     # Start with 1 'FUEL'
-    quantity_needed = {'FUEL':1}
-    while len(count_reactions_used_in) > 1: # 0:
-    # while True:
-        chemical_list = list(count_reactions_used_in.keys())
-        count_list = list(count_reactions_used_in.values())
+    quantity_needed = {"FUEL": 1}
+
+    # While the data structure listing how many reactions have a given reactant
+    while len(count_reactions_not_yet_analyzed) > 1:
+        # Find a chemical (this_product) that is
+        # (1) the product of a reaction that hasn't been analyzed yet
+        # (2) not a reactant in any not yet analyzed reactions
+        # (We will analyze the reaction that creates that chemical next)
+        chemical_list = list(count_reactions_not_yet_analyzed.keys())
+        count_list = list(count_reactions_not_yet_analyzed.values())
         the_index = count_list.index(0)
-        the_chemical = chemical_list[the_index]
-        del count_reactions_used_in[the_chemical]
+        this_product = chemical_list[the_index]
+        del count_reactions_not_yet_analyzed[this_product]
 
-        # if len(count_reactions_used_in) == 0:
-            # break
-        # if the_chemical == 'ORE':
-            # dummy = 123
-
-        # ADD TO quantity_needed
-        for the_reactant in the_reactions[the_chemical].reactants:
-            the_reactant_quantity_needed = the_reactant.quantity * math.ceil(quantity_needed[the_chemical] / the_reactions[the_chemical].product.quantity)
-                # the_reactions[the_chemical].product.quantity == 10
-                # 
+        for the_reactant in the_reactions[this_product].reactants:
+            # Update quantity_needed, based on needs for this reaction
+            the_reactant_quantity_needed = the_reactant.quantity * math.ceil(
+                quantity_needed[this_product]
+                / the_reactions[this_product].product.quantity
+            )
             if the_reactant.chemical not in quantity_needed:
                 quantity_needed[the_reactant.chemical] = the_reactant_quantity_needed
             else:
                 quantity_needed[the_reactant.chemical] += the_reactant_quantity_needed
 
-            dummy = 123
-            # REDUCE count_reactions_used_in
-            count_reactions_used_in[the_reactant.chemical] -= 1
-            dummy = 123
-
-        dummy = 123
-        # return 42 # Dummy command to prevent infinite loop
-    dummy = 123
-    return quantity_needed['ORE']
+            # Update this count, since this reactant has been analyzed for this reaction
+            count_reactions_not_yet_analyzed[the_reactant.chemical] -= 1
+    return quantity_needed["ORE"]
 
 
 def solve_problem(input_filename):
     the_reactions, count_reactions_used_in = get_input(input_filename)
-    stepcount = get_stepcount(the_reactions, count_reactions_used_in)
-    print(f'The answer to Part One is: {stepcount}\n')
+    ORE_needed = get_ORE_needed(the_reactions, count_reactions_used_in)
+    print(f"The answer to Part One is: {ORE_needed}\n")
 
-solve_problem('input_sample0.txt')
+
+solve_problem("input_sample0.txt")
