@@ -71,9 +71,13 @@ def get_input(input_filename):
 
 # This solves Problem One
 # (It determines and returns the quantity of ORE needed to create 1 FUEL)
-def get_ORE_needed(the_reactions_original, count_reactions_not_yet_analyzed_original, FUEL_QUANTITY):
+def get_ORE_needed(
+    the_reactions_original, count_reactions_not_yet_analyzed_original, FUEL_QUANTITY
+):
     the_reactions = copy.deepcopy(the_reactions_original)
-    count_reactions_not_yet_analyzed = copy.deepcopy(count_reactions_not_yet_analyzed_original)
+    count_reactions_not_yet_analyzed = copy.deepcopy(
+        count_reactions_not_yet_analyzed_original
+    )
     # Start with 1 'FUEL'
     quantity_needed = {"FUEL": FUEL_QUANTITY}
 
@@ -105,20 +109,39 @@ def get_ORE_needed(the_reactions_original, count_reactions_not_yet_analyzed_orig
     return quantity_needed["ORE"]
 
 
+# This solves Problem Two
+# It uses bisection method
 def get_fuel_from_trillion_ore(the_reactions, count_reactions_used_in, PART_ONE_ANSWER):
     ORE_Q = 10**12
 
-    # Determine lower_guess, upper_guess
-    lower_guess = ORE_Q//PART_ONE_ANSWER
+    # Determine initial values for lower_guesses, upper_guesses for bisection method
+
+    # The lower guess uses ideal case assumption that the amount of Fuel created is
+    # always directly proportional to the amount of ore that it starts with.
+    # (This is not correct, since in many cases the process to create one unit of fuel
+    # does not consume all of its intermediate products .. There are some left over,
+    # so they reduce the amount of ore needed for the next unit of fuel to be produced)
+    lower_guess = ORE_Q // PART_ONE_ANSWER
+
+    # If the initial lower guess is too high, then lower it (I don't expect this to ever
+    # happen, but I am protecting from that scenario, anyway)
     while get_ORE_needed(the_reactions, count_reactions_used_in, lower_guess) > ORE_Q:
-        lower_guess /= 2
+        lower_guess //= 2
+
+    # Start with the initial upper guess to be twice that of the lower guess
     upper_guess = 2 * lower_guess
+    # If the initial upper guess isn't high enough, keep doubling it
     while get_ORE_needed(the_reactions, count_reactions_used_in, upper_guess) < ORE_Q:
         upper_guess *= 2
 
+    # Bisection method
+    # (since bisection method is usually thought of as seeking where function is zero,
+    # so it could be viewed as when ore_new_guess - ORE_Q  equals  zero)
     while upper_guess - lower_guess > 1:
         new_guess = (upper_guess + lower_guess) // 2
-        ore_new_guess = get_ORE_needed(the_reactions, count_reactions_used_in, new_guess)
+        ore_new_guess = get_ORE_needed(
+            the_reactions, count_reactions_used_in, new_guess
+        )
         if ore_new_guess == ORE_Q:
             break
         elif ore_new_guess < ORE_Q:
@@ -127,6 +150,7 @@ def get_fuel_from_trillion_ore(the_reactions, count_reactions_used_in, PART_ONE_
             upper_guess = new_guess
     return lower_guess
 
+
 def solve_problem(input_filename):
     # Solve part one
     the_reactions, count_reactions_used_in = get_input(input_filename)
@@ -134,7 +158,10 @@ def solve_problem(input_filename):
     print(f"The answer to Part One is: {ORE_needed}\n")
 
     # Solve part two
-    fuel_from_trillion_ore = get_fuel_from_trillion_ore(the_reactions, count_reactions_used_in, ORE_needed)
+    fuel_from_trillion_ore = get_fuel_from_trillion_ore(
+        the_reactions, count_reactions_used_in, ORE_needed
+    )
     print(f"The answer to Part Two is: {fuel_from_trillion_ore}\n")
+
 
 solve_problem("input_sample2.txt")
