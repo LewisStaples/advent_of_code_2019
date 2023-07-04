@@ -5,6 +5,7 @@
 
 
 import math
+import copy
 
 
 # This class stores a chemical and its associated quantity
@@ -70,9 +71,11 @@ def get_input(input_filename):
 
 # This solves Problem One
 # (It determines and returns the quantity of ORE needed to create 1 FUEL)
-def get_ORE_needed(the_reactions, count_reactions_not_yet_analyzed):
+def get_ORE_needed(the_reactions_original, count_reactions_not_yet_analyzed_original, FUEL_QUANTITY):
+    the_reactions = copy.deepcopy(the_reactions_original)
+    count_reactions_not_yet_analyzed = copy.deepcopy(count_reactions_not_yet_analyzed_original)
     # Start with 1 'FUEL'
-    quantity_needed = {"FUEL": 1}
+    quantity_needed = {"FUEL": FUEL_QUANTITY}
 
     # While the data structure listing how many reactions have a given reactant
     while len(count_reactions_not_yet_analyzed) > 1:
@@ -102,10 +105,36 @@ def get_ORE_needed(the_reactions, count_reactions_not_yet_analyzed):
     return quantity_needed["ORE"]
 
 
+def get_fuel_from_trillion_ore(the_reactions, count_reactions_used_in, PART_ONE_ANSWER):
+    ORE_Q = 10**12
+
+    # Determine lower_guess, upper_guess
+    lower_guess = ORE_Q//PART_ONE_ANSWER
+    while get_ORE_needed(the_reactions, count_reactions_used_in, lower_guess) > ORE_Q:
+        lower_guess /= 2
+    upper_guess = 2 * lower_guess
+    while get_ORE_needed(the_reactions, count_reactions_used_in, upper_guess) < ORE_Q:
+        upper_guess *= 2
+
+    while upper_guess - lower_guess > 1:
+        new_guess = (upper_guess + lower_guess) // 2
+        ore_new_guess = get_ORE_needed(the_reactions, count_reactions_used_in, new_guess)
+        if ore_new_guess == ORE_Q:
+            break
+        elif ore_new_guess < ORE_Q:
+            lower_guess = new_guess
+        else:
+            upper_guess = new_guess
+    return lower_guess
+
 def solve_problem(input_filename):
+    # Solve part one
     the_reactions, count_reactions_used_in = get_input(input_filename)
-    ORE_needed = get_ORE_needed(the_reactions, count_reactions_used_in)
+    ORE_needed = get_ORE_needed(the_reactions, count_reactions_used_in, 1)
     print(f"The answer to Part One is: {ORE_needed}\n")
 
+    # Solve part two
+    fuel_from_trillion_ore = get_fuel_from_trillion_ore(the_reactions, count_reactions_used_in, ORE_needed)
+    print(f"The answer to Part Two is: {fuel_from_trillion_ore}\n")
 
-solve_problem("input_sample0.txt")
+solve_problem("input_sample2.txt")
