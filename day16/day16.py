@@ -23,7 +23,8 @@ def update_signal(signal_input, phase_num):
     # base_pattern = [x for x in BASE_PATTERN for _ in [0] * phase_num]
     # print(phase_num)
 
-    while len(signal_output) < 8:
+    # while len(signal_output) < 8:
+    while len(signal_output) < len(signal_input):
     # for output_digit_number in range(8):
         new_output_digit = 0
         base_pattern = [x for x in BASE_PATTERN for _ in [0] * (len(signal_output) + 1)]
@@ -45,26 +46,25 @@ def update_signal(signal_input, phase_num):
     return signal_output
 
 
-def display_signal(the_signal):
-    # print(''.join(display_signal))
-    for the_int in the_signal:
-        print(the_int, end = '')
-        # print(the_int, end = ' ')
-    # print()
+def display_signal(the_signal, num_digits):
+    # for the_int in the_signal:
+    #     print(the_int, end = '')
+    for digit_index in range(num_digits):
+        print(the_signal[digit_index], end = '')
 
 
 def solve_problem(input_filename):
-    TOTAL_PHASES_TO_RUN = 4
+    total_phases_to_run = None
     the_signal = get_signal(input_filename)
-    # for phase_num in range(1, 5):
-    # for phase_num in range(1, 3):
-    for phase_num in range(1, 1 + TOTAL_PHASES_TO_RUN):
+    total_phases_to_run = 4 if len(the_signal) == 8 else 100
+    for phase_num in range(1, 1 + total_phases_to_run):
         the_signal = update_signal(the_signal, phase_num)
         # display_signal(the_signal)
     #     print(f'{phase_num}', end = '')
         # print()
-    print(f'After running {TOTAL_PHASES_TO_RUN} phases: ', end = '')
-    display_signal(the_signal)
+    print(f'After running {total_phases_to_run} phases: ', end = '')
+    display_signal(the_signal, 8)
+    print()
     print()
 
 
