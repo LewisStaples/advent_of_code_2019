@@ -6,6 +6,9 @@
 
 # POTENTIAL ALTERNATIVE FOR MUTLIPLE LINE INPUT FILES ....
 
+# This reads the input file and returns the state
+# (The state is a list of lists of characters
+# from the input:  "." and "#")
 def get_input(input_filename):
     ret_val = list()
     # Reading input from the input file
@@ -16,34 +19,67 @@ def get_input(input_filename):
             in_string = in_string.rstrip()
             print(in_string)
             ret_val.append(list(in_string))
-
-            dummy = 123
     print()
     return ret_val
+
 
 def get_biodiversity_rating(state):
     ret_val = 0
     tile_value = 1
-    # tile = {
-    #     'tile_coords': [0,0],
-    #     'tile_value': 1
-    # }
     for y_val in range(len(state[0])):
         for x_val in range(len(state)):
             if state[y_val][x_val] == '#':
-                print(f'{x_val}:{y_val} --> OLD: {ret_val} NEW:', end = ' ')
                 ret_val += tile_value
-                print(ret_val)
             tile_value *= 2
-
     return ret_val
+
+# THIS IS NOT YET IMPLEMENTED !!!
+# (Right now it is flipping all positions ... # and . )
+def get_count_adj_bugs(state, i_row, i_position):
+    return 1
+
+
+def new_position(state, i_row, i_position):
+    count_adj_bugs = get_count_adj_bugs(state, i_row, i_position)
+    if state[i_row][i_position] == '#' and count_adj_bugs == 1:
+        return '.'
+    if state[i_row][i_position] == '.' and count_adj_bugs in [1,2]:
+        return '#'
+    return state[i_row][i_position]
+
+def next_minute(state):
+    new_state = list()
+
+    for i_row, row in enumerate(state):
+        new_state.append(list())
+        for i_position, position in enumerate(row):
+            new_state[-1].append(
+                new_position(state, i_row, i_position)
+            )
+            dummy = 123
+
+    return new_state
+
+
+def get_first_repeat(state):
+    bio_rat_set = {get_biodiversity_rating(state)}
+    while True:
+        state = next_minute(state)
+        new_bio_rat = get_biodiversity_rating(state)
+        if new_bio_rat in bio_rat_set:
+            return new_bio_rat
+        dummy = 123
+        break
+
+
 
 def solve_problem(input_filename):
     state = get_input(input_filename)
+    first_repeat = get_first_repeat(state)
     
 solve_problem('input_sample0.txt')
 
-def test_sample_0():
+def test__get_biodiversity_rating():
     state = get_input('input_biodiversity_sample.txt')
     assert get_biodiversity_rating(state) == 2129920
 
