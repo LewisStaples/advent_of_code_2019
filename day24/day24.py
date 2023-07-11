@@ -33,15 +33,34 @@ def get_biodiversity_rating(state):
             tile_value *= 2
     return ret_val
 
+# Return 1 if it's a bug, else return 0
+# (if posn is off the charts, also return 0)
+def get_posn_value(state, i_row, i_position):
+    if i_row < 0 or i_position < 0:
+        return 0
+    try:
+        if state[i_row][i_position] == '#':
+            return 1
+    except IndexError:
+        pass # It will follow below logic
+        # return 0
+
+    return 0
+
 # THIS IS NOT YET IMPLEMENTED !!!
-# (Right now it is flipping all positions ... # and . )
 def get_count_adj_bugs(state, i_row, i_position):
-    return 1
+    ret_val = 0
+    for diff in [1, -1]:
+        ret_val += get_posn_value(state, i_row + diff, i_position)
+        ret_val += get_posn_value(state, i_row, i_position + diff)
+
+    return ret_val
+    # return 1
 
 
 def new_position(state, i_row, i_position):
     count_adj_bugs = get_count_adj_bugs(state, i_row, i_position)
-    if state[i_row][i_position] == '#' and count_adj_bugs == 1:
+    if state[i_row][i_position] == '#' and count_adj_bugs != 1:
         return '.'
     if state[i_row][i_position] == '.' and count_adj_bugs in [1,2]:
         return '#'
@@ -52,7 +71,7 @@ def next_minute(state):
 
     for i_row, row in enumerate(state):
         new_state.append(list())
-        for i_position, position in enumerate(row):
+        for i_position, _ in enumerate(row):
             new_state[-1].append(
                 new_position(state, i_row, i_position)
             )
@@ -67,17 +86,20 @@ def get_first_repeat(state):
         state = next_minute(state)
         new_bio_rat = get_biodiversity_rating(state)
         if new_bio_rat in bio_rat_set:
+            dummy = 123
             return new_bio_rat
+        bio_rat_set.add(new_bio_rat)
         dummy = 123
-        break
+        # break
 
 
 
 def solve_problem(input_filename):
     state = get_input(input_filename)
     first_repeat = get_first_repeat(state)
+    print(f'{first_repeat = }\n')
     
-solve_problem('input_sample0.txt')
+solve_problem('input.txt')
 
 def test__get_biodiversity_rating():
     state = get_input('input_biodiversity_sample.txt')
