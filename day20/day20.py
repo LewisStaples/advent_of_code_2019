@@ -3,6 +3,7 @@
 # adventOfCode 2023 day 20
 # https://adventofcode.com/2023/day/20
 
+import numpy as np
 
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
@@ -44,20 +45,60 @@ def get_portals(input_filename):
     return portals
     
 
+def get_adjacents(point_iterable):
+    ADJ_DIRS = np.array([[0,1], [0,-1],[1,0],[-1,0]])
+    ret_val = set()
+    for point in point_iterable:
+        point = np.array(point)
+        for direction in ADJ_DIRS:
+            ret_val.add(tuple(point + direction))
+    return ret_val.difference(point_iterable)
+
+
+def get_input_char_grid(input_filename):
+    input_char_grid = list()
+    with open(input_filename) as f:
+        # for row_number, line_input in enumerate(f):
+        for line_input in f:
+            input_char_grid.append(list())
+            # for col_number, char_input in enumerate(line_input):
+            for char_input in line_input:
+                input_char_grid[-1].append(char_input)
+    return input_char_grid
+
 def get_min_steps_needed(the_portal_dicts, input_filename):
+    input_char_grid = get_input_char_grid(input_filename)
+
+    # Initial state
     current_state = {
         'step_count' : 0,
         'positions': set()
-        # {
-        #     # position for position in position_pair
-        #     position_pair for position_pair in the_portal_dicts['AA']
-        #     # position for position in position_pair
-        # }
     }
     for position_pair in the_portal_dicts['AA']:
         current_state['positions'].add(position_pair[0])
         current_state['positions'].add(position_pair[1])
-    dummy = 123
+    outer_boundary = current_state['positions'].union(set())
+
+    # Make changes, one step at a time
+    while True:
+        current_state['step_count'] += 1
+        for adj_position in get_adjacents(outer_boundary):
+            # Don't consider spaces that have already been considered
+            if adj_position in current_state['positions']:
+                continue
+            # Don't consider spaces that are out of bounds
+            if True in [adj_position[0] < 0, adj_position[1] < 0, 
+                        adj_position[0] >= len(input_char_grid), 
+                        adj_position[1] >= len(input_char_grid[0])]:
+                continue
+            # Don't consider points already in the outer boundary
+
+            # If it is a letter, add that portal
+            #      current_state['positions']
+            #      the_portal_dicts
+
+            # If it is a period ('.'), add the period to current_state['positions']
+        break
 
 
 def solve_problem(input_filename):
