@@ -71,17 +71,26 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
 
     # Initial state
     current_state = {
-        'step_count' : 0,
+        'step_count' : -2,
         'positions': set()
     }
+    outer_boundary_next = set()
     for position_pair in the_portal_dicts['AA']:
-        current_state['positions'].add(position_pair[0])
-        current_state['positions'].add(position_pair[1])
-    outer_boundary = current_state['positions'].union(set())
+        # current_state['positions'].add(position_pair[0])
+        # current_state['positions'].add(position_pair[1])
+        outer_boundary_next.add(position_pair[0])
+        outer_boundary_next.add(position_pair[1])
+    
+    # outer_boundary_next = current_state['positions'].union(set())
+    outer_boundary = set()
 
     # Make changes, one step at a time
     while True:
         current_state['step_count'] += 1
+        current_state['positions'] = current_state['positions'].union(outer_boundary)
+        outer_boundary = outer_boundary.union(outer_boundary_next)
+        outer_boundary_next = set()
+
         for adj_position in get_adjacents(outer_boundary):
             # Don't consider spaces that have already been considered
             if adj_position in current_state['positions']:
@@ -93,17 +102,50 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
                 continue
             # Don't consider points already in the outer boundary
 
-            # If it is a letter, add that portal
+            # If it is a letter
+            if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
+                # for adj_position2 in get_adjacents(list(adj_position)):
+                for adj_position2 in get_adjacents([adj_position]):
+                    if input_char_grid[adj_position2[0]][adj_position2[1]].isalpha():
+                        # construct the new portal's name
+                        new_portal_name = None
+                        if adj_position2[0] + adj_position2[1] > adj_position[0] + adj_position[1]:
+                            new_portal_name = input_char_grid[adj_position[0]][adj_position[1]] + input_char_grid[adj_position2[0]][adj_position2[1]]
+                        else:
+                            new_portal_name = input_char_grid[adj_position2[0]][adj_position2[1]] + input_char_grid[adj_position[0]][adj_position[1]]
+                        
+                        if new_portal_name == 'ZZ':
+                            dummy = 123
+                            # print(f'Step count: {current_state["step_count"]}')
+                            return current_state["step_count"]
+
+                        # --->  LOOK UP ALL POINTS FOR THE NEW_PORTAL_NAME AND ADD THOSE TO THE OUTER BOUNDARY<---
+                        for portal_instance in the_portal_dicts[new_portal_name]:
+                            for portal_coords in portal_instance:
+                                if portal_coords in current_state['positions']:
+                                    continue
+                                outer_boundary_next.add(portal_coords)
+                        dummy = 123
+
+
+
+            # if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
+            #     for adj_position2 in get_adjacents(list(adj_position)):
+            #         if adj_position2.isalpha():
+
             #      current_state['positions']
             #      the_portal_dicts
 
             # If it is a period ('.'), add the period to current_state['positions']
-        break
+            if input_char_grid[adj_position[0]][adj_position[1]] == '.':
+                outer_boundary_next.add(adj_position)
+        # break
 
 
 def solve_problem(input_filename):
     the_portal_dicts = get_portals(input_filename)
     min_steps_needed = get_min_steps_needed(the_portal_dicts, input_filename)
+    print(f'Minimum steps needed: {min_steps_needed}\n')
 
 solve_problem('input_sample0.txt')
 
