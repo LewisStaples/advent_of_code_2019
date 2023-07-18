@@ -66,6 +66,37 @@ def get_input_char_grid(input_filename):
                 input_char_grid[-1].append(char_input)
     return input_char_grid
 
+def out_of_bounds(adj_position, input_char_grid):
+    # Don't consider spaces that are out of bounds
+    if True in [adj_position[0] < 0, adj_position[1] < 0, 
+                adj_position[0] >= len(input_char_grid), 
+                adj_position[1] >= len(input_char_grid[0])]:
+        # continue
+        return True
+    return False
+
+
+def already_considered(adj_position, current_state, outer_boundary):
+    # Don't consider spaces that have already been considered
+    if adj_position in current_state['positions']:
+        # continue
+        return True
+    # Don't consider points already in the outer boundary
+    if adj_position in outer_boundary:
+        return True
+    return False
+
+
+
+def forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
+        if already_considered(portal_adj, current_state, outer_boundary):
+            return True
+        if out_of_bounds(portal_adj, input_char_grid):
+            return True
+        if input_char_grid[portal_adj[0]][portal_adj[1]] in [' ', '#']:
+            return True
+        return False
+                   
 def get_min_steps_needed(the_portal_dicts, input_filename):
     input_char_grid = get_input_char_grid(input_filename)
 
@@ -76,31 +107,43 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
     }
     outer_boundary_next = set()
     for position_pair in the_portal_dicts['AA']:
-        # current_state['positions'].add(position_pair[0])
-        # current_state['positions'].add(position_pair[1])
         outer_boundary_next.add(position_pair[0])
         outer_boundary_next.add(position_pair[1])
     
-    # outer_boundary_next = current_state['positions'].union(set())
     outer_boundary = set()
 
     # Make changes, one step at a time
     while True:
         current_state['step_count'] += 1
         current_state['positions'] = current_state['positions'].union(outer_boundary)
-        outer_boundary = outer_boundary.union(outer_boundary_next)
+        # outer_boundary = outer_boundary.union(outer_boundary_next)
+        outer_boundary = outer_boundary_next
         outer_boundary_next = set()
 
+
         for adj_position in get_adjacents(outer_boundary):
-            # Don't consider spaces that have already been considered
-            if adj_position in current_state['positions']:
+
+            if forbidden(adj_position, current_state, outer_boundary, input_char_grid):
                 continue
-            # Don't consider spaces that are out of bounds
-            if True in [adj_position[0] < 0, adj_position[1] < 0, 
-                        adj_position[0] >= len(input_char_grid), 
-                        adj_position[1] >= len(input_char_grid[0])]:
-                continue
-            # Don't consider points already in the outer boundary
+
+            # if already_considered(adj_position, current_state, outer_boundary):
+            #     continue
+            # # # Don't consider spaces that have already been considered
+            # # if adj_position in current_state['positions']:
+            # #     continue
+            # # # Don't consider points already in the outer boundary
+
+
+
+            # if out_of_bounds(adj_position, input_char_grid):
+            #     continue
+            # # # Don't consider spaces that are out of bounds
+            # # if True in [adj_position[0] < 0, adj_position[1] < 0, 
+            # #             adj_position[0] >= len(input_char_grid), 
+            # #             adj_position[1] >= len(input_char_grid[0])]:
+            # #     continue
+
+
 
             # If it is a letter
             if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
@@ -119,13 +162,28 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
                             # print(f'Step count: {current_state["step_count"]}')
                             return current_state["step_count"]
 
-                        # --->  LOOK UP ALL POINTS FOR THE NEW_PORTAL_NAME AND ADD THOSE TO THE OUTER BOUNDARY<---
+                        # Ideally I should look up all alternative locations for the portal and add their adjacent points to the outer boundary
+                        # (Instead I will look up all locations for the portal and add their adjacent points to the outer boundary)
                         for portal_instance in the_portal_dicts[new_portal_name]:
-                            for portal_coords in portal_instance:
-                                if portal_coords in current_state['positions']:
+                            for portal_adj in get_adjacents(portal_instance):
+
+                                # if portal_adj in current_state['positions']:
+                                #     continue
+
+                                # if already_considered(portal_adj, current_state, outer_boundary):
+                                #     continue
+                                # if out_of_bounds(portal_adj, input_char_grid):
+                                #     continue
+                                if forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
                                     continue
-                                outer_boundary_next.add(portal_coords)
-                        dummy = 123
+                                outer_boundary_next.add(portal_adj)
+
+                            # for portal_coords in portal_instance:
+                            # outer_boundary_next.add(get_adjacents(portal_instance))
+                                # if portal_coords in current_state['positions']:
+                                #     continue
+                                # outer_boundary_next.add(get_adjacents([portal_coords))
+                                # dummy = 123
 
 
 
@@ -138,6 +196,8 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
 
             # If it is a period ('.'), add the period to current_state['positions']
             if input_char_grid[adj_position[0]][adj_position[1]] == '.':
+                if adj_position in current_state['positions']:
+                    continue
                 outer_boundary_next.add(adj_position)
         # break
 
