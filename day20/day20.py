@@ -67,14 +67,19 @@ def get_input_char_grid(input_filename):
     return input_char_grid
 
 def out_of_bounds(adj_position, input_char_grid):
-    # Don't consider spaces that are out of bounds
-    if True in [adj_position[0] < 0, adj_position[1] < 0, 
-                adj_position[0] >= len(input_char_grid), 
-                adj_position[1] >= len(input_char_grid[adj_position[0]])]:
-        # continue
-        return True
-    return False
-
+    try:
+        # Don't consider spaces that are out of bounds
+        if True in [adj_position[0] < 0, adj_position[1] < 0, 
+                    adj_position[0] >= len(input_char_grid)]:
+            return True
+        
+        # This condition is checked only if none of the above are True
+        # (because two of the above will trigger an IndexError)
+        if adj_position[1] >= len(input_char_grid[adj_position[0]]):
+            return True
+        return False
+    except IndexError:
+        dummy = 123
 
 def already_considered(adj_position, current_state, outer_boundary):
     # Don't consider spaces that have already been considered
@@ -207,7 +212,7 @@ def solve_problem(input_filename):
     min_steps_needed = get_min_steps_needed(the_portal_dicts, input_filename)
     print(f'Minimum steps needed: {min_steps_needed}\n')
 
-solve_problem('input_sample1.txt')
+solve_problem('input.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
