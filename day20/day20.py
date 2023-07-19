@@ -70,7 +70,7 @@ def out_of_bounds(adj_position, input_char_grid):
     # Don't consider spaces that are out of bounds
     if True in [adj_position[0] < 0, adj_position[1] < 0, 
                 adj_position[0] >= len(input_char_grid), 
-                adj_position[1] >= len(input_char_grid[0])]:
+                adj_position[1] >= len(input_char_grid[adj_position[0]])]:
         # continue
         return True
     return False
@@ -207,7 +207,7 @@ def solve_problem(input_filename):
     min_steps_needed = get_min_steps_needed(the_portal_dicts, input_filename)
     print(f'Minimum steps needed: {min_steps_needed}\n')
 
-solve_problem('input_sample0.txt')
+solve_problem('input_sample1.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
