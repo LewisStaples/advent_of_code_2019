@@ -10,13 +10,22 @@ def add_portal_location(portals, location1, location2, portal_name):
         portals[portal_name] = list()
     portals[portal_name].append( (location1, location2) )
 
-def get_portals(input_filename):
+def get_maze_info(input_filename):
+    # In part 2, this will return portals, outer_boundaries
+
     # Each portal will be a node as defined in graph theory
     # And it will be stored here as a dict with
     # index == the two-letter label of the portal
     # value == a list of two point pairs where the portal may be found in the input file
     portals = dict()
 
+    outer_boundaries = {
+        'lowest_row': float('inf'),
+        'largest_row': float('-inf'),
+        'lowest_col': float('inf'),
+        'largest_col': float('-inf'),
+    }
+    
     # Reading input from the input file
     print(f'\nUsing input file: {input_filename}\n')
     with open(input_filename) as f:
@@ -26,10 +35,17 @@ def get_portals(input_filename):
 
         # Pull in each line from the input file
         for row_number, in_string in enumerate(f):
+            # Populate portals
             in_string = in_string.rstrip()
             col_number = -1
             while col_number < len(in_string) - 1:
                 col_number += 1
+
+                # Populate outer_boundaries (new functionality in Part 2)
+                if in_string[col_number] == '#':
+                    outer_boundaries['largest_col'] = max(outer_boundaries['largest_col'], col_number)
+                    outer_boundaries['lowest_col'] = min(outer_boundaries['lowest_col'], col_number)
+
                 if in_string[col_number].isalpha():
                     if col_number > 0:
                         if in_string[col_number - 1].isalpha():
@@ -42,7 +58,13 @@ def get_portals(input_filename):
                         del cols_with_letters_to_finish[col_number]
                     else:
                         cols_with_letters_to_finish[col_number] = in_string[col_number]
-    return portals
+
+            # Populate outer_boundaries (new functionality in Part 2)
+            bound_index = in_string.find('#')
+            if bound_index > -1:
+                outer_boundaries['largest_row'] = max(outer_boundaries['largest_row'], row_number)
+                outer_boundaries['lowest_row'] = min(outer_boundaries['lowest_row'], row_number)
+    return portals, outer_boundaries
     
 
 def get_adjacents(point_iterable):
@@ -67,19 +89,17 @@ def get_input_char_grid(input_filename):
     return input_char_grid
 
 def out_of_bounds(adj_position, input_char_grid):
-    try:
-        # Don't consider spaces that are out of bounds
-        if True in [adj_position[0] < 0, adj_position[1] < 0, 
-                    adj_position[0] >= len(input_char_grid)]:
-            return True
-        
-        # This condition is checked only if none of the above are True
-        # (because two of the above will trigger an IndexError)
-        if adj_position[1] >= len(input_char_grid[adj_position[0]]):
-            return True
-        return False
-    except IndexError:
-        dummy = 123
+    # Don't consider spaces that are out of bounds
+    if True in [adj_position[0] < 0, adj_position[1] < 0, 
+                adj_position[0] >= len(input_char_grid)]:
+        return True
+    
+    # This condition is checked only if none of the above are True
+    # (because two of the above will trigger an IndexError)
+    if adj_position[1] >= len(input_char_grid[adj_position[0]]):
+        return True
+    return False
+
 
 def already_considered(adj_position, current_state, outer_boundary):
     # Don't consider spaces that have already been considered
@@ -208,11 +228,11 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
 
 
 def solve_problem(input_filename):
-    the_portal_dicts = get_portals(input_filename)
+    the_portal_dicts, outer_boundaries = get_maze_info(input_filename)
     min_steps_needed = get_min_steps_needed(the_portal_dicts, input_filename)
     print(f'Minimum steps needed: {min_steps_needed}\n')
 
-solve_problem('input.txt')
+solve_problem('input_sample0.txt')
 
 # def test_sample_0():
 #     solve_problem('input_sample0.txt')
