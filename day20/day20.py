@@ -8,7 +8,13 @@ import numpy as np
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
         portals[portal_name] = list()
-    portals[portal_name].append( (location1, location2) )
+
+    # portals[portal_name].append( (location1, location2) )
+    portals[portal_name].append(
+        {
+            'locations': (location1, location2),
+        }
+    )
 
 def get_maze_info(input_filename):
     # In part 2, this will return portals, outer_boundaries
@@ -64,6 +70,9 @@ def get_maze_info(input_filename):
             if bound_index > -1:
                 outer_boundaries['largest_row'] = max(outer_boundaries['largest_row'], row_number)
                 outer_boundaries['lowest_row'] = min(outer_boundaries['lowest_row'], row_number)
+            
+            # Go through list of portals and label them as internal or external
+
     return portals, outer_boundaries
     
 
@@ -131,10 +140,15 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
         'positions': set()
     }
     outer_boundary_next = set()
-    for position_pair in the_portal_dicts['AA']:
-        outer_boundary_next.add(position_pair[0])
-        outer_boundary_next.add(position_pair[1])
-    
+
+    # for position_pair in the_portal_dicts['AA']:
+    #     outer_boundary_next.add(position_pair[0])
+    #     outer_boundary_next.add(position_pair[1])
+
+    for portal_position in the_portal_dicts['AA']:
+        outer_boundary_next.add(portal_position['locations'][0])
+        outer_boundary_next.add(portal_position['locations'][1])
+
     outer_boundary = set()
 
     # Make changes, one step at a time
@@ -190,7 +204,8 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
                         # Ideally I should look up all alternative locations for the portal and add their adjacent points to the outer boundary
                         # (Instead I will look up all locations for the portal and add their adjacent points to the outer boundary)
                         for portal_instance in the_portal_dicts[new_portal_name]:
-                            for portal_adj in get_adjacents(portal_instance):
+                            # for portal_adj in get_adjacents(portal_instance):
+                            for portal_adj in get_adjacents(portal_instance['locations']):
 
                                 # if portal_adj in current_state['positions']:
                                 #     continue
@@ -230,7 +245,7 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
 def solve_problem(input_filename):
     the_portal_dicts, outer_boundaries = get_maze_info(input_filename)
     min_steps_needed = get_min_steps_needed(the_portal_dicts, input_filename)
-    print(f'Minimum steps needed: {min_steps_needed}\n')
+    print(f'Part 1 Minimum steps needed: {min_steps_needed}\n')
 
 solve_problem('input_sample0.txt')
 
