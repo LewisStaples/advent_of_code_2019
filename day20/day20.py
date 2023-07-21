@@ -4,6 +4,11 @@
 # https://adventofcode.com/2023/day/20
 
 import numpy as np
+from enum import Enum
+
+class PortalType(Enum):
+    EXTERIOR = 1
+    INTERIOR = 2
 
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
@@ -15,6 +20,20 @@ def add_portal_location(portals, location1, location2, portal_name):
             'locations': (location1, location2),
         }
     )
+
+
+def outside(location_iterator, outer_boundaries):
+    row_num = location_iterator[0][0]  # This is one of the row numbers
+    col_num = location_iterator[0][1]  # This is one of the column numbers
+    if row_num < outer_boundaries['lowest_row']:
+        return True
+    if row_num > outer_boundaries['largest_row']:
+        return True
+    if col_num < outer_boundaries['lowest_col']:
+        return True
+    if col_num > outer_boundaries['largest_col']:
+        return True
+    return False
 
 def get_maze_info(input_filename):
     # In part 2, this will return portals, outer_boundaries
@@ -71,7 +90,13 @@ def get_maze_info(input_filename):
                 outer_boundaries['largest_row'] = max(outer_boundaries['largest_row'], row_number)
                 outer_boundaries['lowest_row'] = min(outer_boundaries['lowest_row'], row_number)
             
-            # Go through list of portals and label them as internal or external
+    # Go through list of portals and label them as internal or external
+    for portal_name, portal_group in portals.items():
+        for portal_instance in portal_group:
+            if outside(portal_instance['locations'], outer_boundaries):
+                portal_instance['portal_type'] = PortalType.EXTERIOR
+            else:
+                portal_instance['portal_type'] = PortalType.INTERIOR
 
     return portals, outer_boundaries
     
