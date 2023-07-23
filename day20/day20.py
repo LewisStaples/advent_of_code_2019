@@ -10,11 +10,15 @@ class PortalType(Enum):
     EXTERIOR = 1
     INTERIOR = 2
 
+class Site:
+    def __init__(self, position, level):
+        self.level = level
+        self.position = position
+
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
         portals[portal_name] = list()
 
-    # portals[portal_name].append( (location1, location2) )
     portals[portal_name].append(
         {
             'locations': (location1, location2),
@@ -101,58 +105,103 @@ def get_maze_info(input_filename):
     return portals, outer_boundaries
     
 
-def get_adjacents(point_iterable):
+# def get_adjacents(point_iterable):
+def get_site_adjacents(in_site):
     ADJ_DIRS = np.array([[0,1], [0,-1],[1,0],[-1,0]])
     ret_val = set()
-    for point in point_iterable:
-        point = np.array(point)
-        for direction in ADJ_DIRS:
-            ret_val.add(tuple(point + direction))
-    return ret_val.difference(point_iterable)
+    # for point in point_iterable:
+    #     point = np.array(point)
+    #     for direction in ADJ_DIRS:
+    #         ret_val.add(tuple(point + direction))
+    # return ret_val.difference(point_iterable)
+    #########
+    # for site in site_iterable:
+    #     position = np.array(site.position)
+    #     for direction in ADJ_DIRS:
+    #         ret_val.add(
+    #             Site(tuple(position + direction), site.level + 1)
+    #         )
+    # return ret_val.difference(site_iterable)
+    position = np.array(in_site.position)
+    for direction in ADJ_DIRS:
+        ret_val.add(
+            Site(tuple(position + direction), in_site.level)
+        )
+    return ret_val
 
+def get_site_iter_adjacents(in_site_iter):
+    ret_val = set()
+    for in_site in in_site_iter:
+        # ret_val.add(get_site_adjacents(in_site))
+        ret_val = ret_val.union(get_site_adjacents(in_site))
+    return ret_val.difference(in_site_iter)
 
 def get_input_char_grid(input_filename):
     input_char_grid = list()
     with open(input_filename) as f:
-        # for row_number, line_input in enumerate(f):
         for line_input in f:
             input_char_grid.append(list())
-            # for col_number, char_input in enumerate(line_input):
             for char_input in line_input:
                 input_char_grid[-1].append(char_input)
     return input_char_grid
 
-def out_of_bounds(adj_position, input_char_grid):
-    # Don't consider spaces that are out of bounds
-    if True in [adj_position[0] < 0, adj_position[1] < 0, 
-                adj_position[0] >= len(input_char_grid)]:
-        return True
+# def out_of_bounds(adj_position, input_char_grid):
+#     # Don't consider spaces that are out of bounds
+#     if True in [adj_position[0] < 0, adj_position[1] < 0, 
+#                 adj_position[0] >= len(input_char_grid)]:
+#         return True
+#     # This condition is checked only if none of the above are True
+#     # (because two of the above will trigger an IndexError)
+#     if adj_position[1] >= len(input_char_grid[adj_position[0]]):
+#         return True
+#     return False
+def out_of_bounds(adj_site, input_char_grid):
+    try:
+        
+        # Don't consider spaces that are out of bounds
+        if True in [adj_site.position[0] < 0, adj_site.position[1] < 0, 
+                    adj_site.position[0] >= len(input_char_grid)]:
+            return True
     
+    except ValueError:
+        dummy = 123
+
     # This condition is checked only if none of the above are True
     # (because two of the above will trigger an IndexError)
-    if adj_position[1] >= len(input_char_grid[adj_position[0]]):
+    if adj_site.position[1] >= len(input_char_grid[adj_site.position[0]]):
         return True
     return False
 
-
-def already_considered(adj_position, current_state, outer_boundary):
+# def already_considered(adj_position, current_state, outer_boundary):
+#     # Don't consider spaces that have already been considered
+#     if adj_position in current_state['positions']:
+#         return True
+#     # Don't consider points already in the outer boundary
+#     if adj_position in outer_boundary:
+#         return True
+#     return False
+def already_considered(adj_site, current_state, outer_boundary):
     # Don't consider spaces that have already been considered
-    if adj_position in current_state['positions']:
-        # continue
+    if adj_site in current_state['positions']:
         return True
     # Don't consider points already in the outer boundary
-    if adj_position in outer_boundary:
+    if adj_site in outer_boundary:
         return True
     return False
 
-
-
-def forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
-        if already_considered(portal_adj, current_state, outer_boundary):
+# def forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
+def forbidden(adj_site, current_state, outer_boundary, input_char_grid):
+        # if already_considered(portal_adj, current_state, outer_boundary):
+        #     return True
+        # if out_of_bounds(portal_adj, input_char_grid):
+        #     return True
+        # if input_char_grid[portal_adj[0]][portal_adj[1]] in [' ', '#']:
+        #     return True
+        if already_considered(adj_site, current_state, outer_boundary):
             return True
-        if out_of_bounds(portal_adj, input_char_grid):
+        if out_of_bounds(adj_site, input_char_grid):
             return True
-        if input_char_grid[portal_adj[0]][portal_adj[1]] in [' ', '#']:
+        if input_char_grid[adj_site.position[0]][adj_site.position[1]] in [' ', '#']:
             return True
         return False
                    
@@ -166,105 +215,89 @@ def get_min_steps_needed(the_portal_dicts, input_filename):
     }
     outer_boundary_next = set()
 
-    # for position_pair in the_portal_dicts['AA']:
-    #     outer_boundary_next.add(position_pair[0])
-    #     outer_boundary_next.add(position_pair[1])
-
     for portal_position in the_portal_dicts['AA']:
-        outer_boundary_next.add(portal_position['locations'][0])
-        outer_boundary_next.add(portal_position['locations'][1])
-
+        # outer_boundary_next.add(portal_position['locations'][0])
+        # outer_boundary_next.add(portal_position['locations'][1])
+        outer_boundary_next.add(
+            Site(portal_position['locations'][0], 0)
+            )
+        outer_boundary_next.add(
+            Site(portal_position['locations'][1], 0)
+            )
     outer_boundary = set()
-
     # Make changes, one step at a time
     while True:
         current_state['step_count'] += 1
         current_state['positions'] = current_state['positions'].union(outer_boundary)
-        # outer_boundary = outer_boundary.union(outer_boundary_next)
         outer_boundary = outer_boundary_next
         outer_boundary_next = set()
-
-
-        for adj_position in get_adjacents(outer_boundary):
-
-            if forbidden(adj_position, current_state, outer_boundary, input_char_grid):
+        # for adj_position in get_adjacents(outer_boundary):
+        for adj_site in get_site_iter_adjacents(outer_boundary):
+            # if forbidden(adj_position, current_state, outer_boundary, input_char_grid):
+            #     continue
+            if forbidden(adj_site, current_state, outer_boundary, input_char_grid):
                 continue
 
-            # if already_considered(adj_position, current_state, outer_boundary):
-            #     continue
-            # # # Don't consider spaces that have already been considered
-            # # if adj_position in current_state['positions']:
-            # #     continue
-            # # # Don't consider points already in the outer boundary
+            # # If it is a letter
+            # if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
+            #     for adj_position2 in get_adjacents([adj_position]):
+            #         if input_char_grid[adj_position2[0]][adj_position2[1]].isalpha():
+            #             # construct the new portal's name
+            #             new_portal_name = None
+            #             if adj_position2[0] + adj_position2[1] > adj_position[0] + adj_position[1]:
+            #                 new_portal_name = input_char_grid[adj_position[0]][adj_position[1]] + input_char_grid[adj_position2[0]][adj_position2[1]]
+            #             else:
+            #                 new_portal_name = input_char_grid[adj_position2[0]][adj_position2[1]] + input_char_grid[adj_position[0]][adj_position[1]]
+            #             if new_portal_name == 'ZZ':
+            #                 return current_state["step_count"]
 
+            #             # Ideally I should look up all alternative locations for the portal and add their adjacent points to the outer boundary
+            #             # (Instead I will look up all locations for the portal and add their adjacent points to the outer boundary)
+            #             for portal_instance in the_portal_dicts[new_portal_name]:
+            #                 # for portal_adj in get_adjacents(portal_instance):
+            #                 for portal_adj in get_adjacents(portal_instance['locations']):
 
-
-            # if out_of_bounds(adj_position, input_char_grid):
-            #     continue
-            # # # Don't consider spaces that are out of bounds
-            # # if True in [adj_position[0] < 0, adj_position[1] < 0, 
-            # #             adj_position[0] >= len(input_char_grid), 
-            # #             adj_position[1] >= len(input_char_grid[0])]:
-            # #     continue
-
-
+            #                     if forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
+            #                         continue
+            #                     outer_boundary_next.add(portal_adj)
 
             # If it is a letter
-            if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
-                # for adj_position2 in get_adjacents(list(adj_position)):
-                for adj_position2 in get_adjacents([adj_position]):
-                    if input_char_grid[adj_position2[0]][adj_position2[1]].isalpha():
+            if input_char_grid[adj_site.position[0]][adj_site.position[1]].isalpha():
+                for adj_site2 in get_site_adjacents(adj_site):
+                    if input_char_grid[adj_site2.position[0]][adj_site2.position[1]].isalpha():
                         # construct the new portal's name
                         new_portal_name = None
-                        if adj_position2[0] + adj_position2[1] > adj_position[0] + adj_position[1]:
-                            new_portal_name = input_char_grid[adj_position[0]][adj_position[1]] + input_char_grid[adj_position2[0]][adj_position2[1]]
+                        if adj_site2.position[0] + adj_site2.position[1] > adj_site.position[0] + adj_site.position[1]:
+                            new_portal_name = input_char_grid[adj_site.position[0]][adj_site.position[1]] + input_char_grid[adj_site2.position[0]][adj_site2.position[1]]
                         else:
-                            new_portal_name = input_char_grid[adj_position2[0]][adj_position2[1]] + input_char_grid[adj_position[0]][adj_position[1]]
-                        
+                            new_portal_name = input_char_grid[adj_site2.position[0]][adj_site2.position[1]] + input_char_grid[adj_site.position[0]][adj_site.position[1]]
                         if new_portal_name == 'ZZ':
-                            dummy = 123
-                            # print(f'Step count: {current_state["step_count"]}')
                             return current_state["step_count"]
 
                         # Ideally I should look up all alternative locations for the portal and add their adjacent points to the outer boundary
                         # (Instead I will look up all locations for the portal and add their adjacent points to the outer boundary)
                         for portal_instance in the_portal_dicts[new_portal_name]:
                             # for portal_adj in get_adjacents(portal_instance):
-                            for portal_adj in get_adjacents(portal_instance['locations']):
+                            for portal_adj in get_site_adjacents(
+                                    Site(portal_instance['locations'], adj_site.level)
+                                ):
 
-                                # if portal_adj in current_state['positions']:
-                                #     continue
-
-                                # if already_considered(portal_adj, current_state, outer_boundary):
-                                #     continue
-                                # if out_of_bounds(portal_adj, input_char_grid):
-                                #     continue
                                 if forbidden(portal_adj, current_state, outer_boundary, input_char_grid):
                                     continue
                                 outer_boundary_next.add(portal_adj)
 
-                            # for portal_coords in portal_instance:
-                            # outer_boundary_next.add(get_adjacents(portal_instance))
-                                # if portal_coords in current_state['positions']:
-                                #     continue
-                                # outer_boundary_next.add(get_adjacents([portal_coords))
-                                # dummy = 123
 
 
+            # if input_char_grid[adj_position[0]][adj_position[1]] == '.':
+            #     if adj_position in current_state['positions']:
+            #         continue
+            #     outer_boundary_next.add(adj_position)
 
-            # if input_char_grid[adj_position[0]][adj_position[1]].isalpha():
-            #     for adj_position2 in get_adjacents(list(adj_position)):
-            #         if adj_position2.isalpha():
-
-            #      current_state['positions']
-            #      the_portal_dicts
-
-            # If it is a period ('.'), add the period to current_state['positions']
-            if input_char_grid[adj_position[0]][adj_position[1]] == '.':
-                if adj_position in current_state['positions']:
+            if input_char_grid[adj_site.position[0]][adj_site.position[1]] == '.':
+                if adj_site in current_state['positions']:
                     continue
-                outer_boundary_next.add(adj_position)
-        # break
+                outer_boundary_next.add(adj_site)
+
 
 
 def solve_problem(input_filename):
