@@ -35,13 +35,24 @@ def outside(location_iterator, outer_boundaries):
     return False
 
 
-def get_maze_info(input_filename):
-    # In part 2, this will return portals, input_char_grid
+def get_input(input_filename):
+    # This will returns portals, input_char_grid
 
     # Each portal will be a node as defined in graph theory
     # And it will be stored here as a dict with
     # index == the two-letter label of the portal
-    # value == a list of two point pairs where the portal may be found in the input file
+    # value == a list of dicts, where each dict represents a portal
+    #       Each portal's dict has two keys: locations, portal_type
+    #                locations is a tuple with two tuples in it, and each of those has (x,y) for one of the portal's positions inside the input file
+    #                portal_type is type PortalType:  either interior or exterior
+    # 
+
+    # input_char_grid is a list of lists
+    # The outer list is a list of rows
+    # Each inner list is a row of characters from the input file
+
+    input_char_grid = list()
+
     portals = dict()
 
     outer_boundaries = {
@@ -61,8 +72,12 @@ def get_maze_info(input_filename):
 
         # Pull in each line from the input file
         for row_number, in_string in enumerate(f):
+            in_string = in_string.replace('\n', '')
+            
+            # Populate input grid
+            input_char_grid.append([ch for ch in in_string])
+
             # Populate portals
-            in_string = in_string.rstrip()
             col_number = -1
             while col_number < len(in_string) - 1:
                 col_number += 1
@@ -99,9 +114,9 @@ def get_maze_info(input_filename):
             else:
                 portal_instance['portal_type'] = PortalType.INTERIOR
 
-    return portals
+    return portals, input_char_grid
     
 
-portals = get_maze_info('input_sample0.txt')
+portals, input_char_grid = get_input('input_sample0.txt')
 
 
