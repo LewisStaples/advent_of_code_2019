@@ -12,13 +12,17 @@ class PortalType(Enum):
 
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
-        portals[portal_name] = list()
+        # portals[portal_name] = list()
+        portals[portal_name] = dict()
 
-    portals[portal_name].append(
-        {
-            'locations': (location1, location2),
-        }
-    )
+    # portals[portal_name].append(
+    #     {
+    #         'locations': (location1, location2),
+    #     }
+    # )
+
+    portal_num_char = 'location' + str(len(portals[portal_name]))
+    portals[portal_name][portal_num_char] = {'positions': (location1, location2)}
 
 
 def outside(location_iterator, outer_boundaries):
@@ -108,11 +112,13 @@ def get_input(input_filename):
             
     # Go through list of portals and label them as internal or external
     for portal_name, portal_group in portals.items():
-        for portal_instance in portal_group:
-            if outside(portal_instance['locations'], outer_boundaries):
-                portal_instance['portal_type'] = PortalType.EXTERIOR
-            else:
-                portal_instance['portal_type'] = PortalType.INTERIOR
+        # for portal_instance in portal_group:
+        #     if outside(portal_instance['locations'], outer_boundaries):
+        #         portal_instance['portal_type'] = PortalType.EXTERIOR
+        #     else:
+        #         portal_instance['portal_type'] = PortalType.INTERIOR
+        
+        dummy = 123
 
     return portals, input_char_grid
     
