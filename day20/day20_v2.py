@@ -117,8 +117,12 @@ def get_input(input_filename):
         #         portal_instance['portal_type'] = PortalType.EXTERIOR
         #     else:
         #         portal_instance['portal_type'] = PortalType.INTERIOR
-        
-        dummy = 123
+        for location_label, location_content in portal_group.items():
+            if outside(location_content['positions'], outer_boundaries):
+                location_content['portal_type'] = PortalType.EXTERIOR
+            else:
+                location_content['portal_type'] = PortalType.INTERIOR
+                dummy = 123
 
     return portals, input_char_grid
     
