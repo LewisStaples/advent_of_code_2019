@@ -5,6 +5,7 @@
 
 import numpy as np
 from enum import Enum
+from copy import deepcopy
 
 class PortalType(Enum):
     EXTERIOR = 1
@@ -12,14 +13,7 @@ class PortalType(Enum):
 
 def add_portal_location(portals, location1, location2, portal_name):
     if portal_name not in portals:
-        # portals[portal_name] = list()
         portals[portal_name] = dict()
-
-    # portals[portal_name].append(
-    #     {
-    #         'locations': (location1, location2),
-    #     }
-    # )
 
     portal_num_char = 'location' + str(len(portals[portal_name]))
     portals[portal_name][portal_num_char] = {'positions': (location1, location2)}
@@ -126,7 +120,35 @@ def get_input(input_filename):
 
     return portals, input_char_grid
     
+def get_adjacents(position, input_char_grid):
+    ret_val = {}
+    return ret_val
 
-portals, input_char_grid = get_input('input_sample0.txt')
+def get_portal_adjacents(portals, input_char_grid, part_number, portal_label):
+    ret_val = {}
+    for portal_value in portals[portal_label].values():
+        dummy = 123
+        for position in portal_value['positions']:
+            dummy = 123
+            ret_val.update(get_adjacents(position, input_char_grid))
+    return ret_val
+
+def get_min_steps_needed(portals, input_char_grid, part_number):
+    pass
+
+    # Get initial state
+    visited_positions = get_portal_adjacents(portals, input_char_grid, part_number, 'AA')
+    latest_positions = deepcopy(visited_positions)
+
+    dummy = 123
+
+    # Loop to take one step at a time using BFS (breadth first search) algorithm
 
 
+
+def solve_problem(input_filename):
+    portals, input_char_grid = get_input(input_filename)
+    min_steps_needed_part1 = get_min_steps_needed(portals, input_char_grid, 1)
+    # min_steps_needed_part2 = get_min_steps_needed(portals, input_char_grid, 2)
+
+solve_problem('input_sample0.txt')
