@@ -7,6 +7,8 @@ import numpy as np
 from enum import Enum
 from copy import deepcopy
 
+NP_DIRECTION_ARRAY = np.array([[0,1],[0,-1],[1,0],[-1,0]])
+
 class PortalType(Enum):
     EXTERIOR = 1
     INTERIOR = 2
@@ -45,9 +47,9 @@ def get_input(input_filename):
     #                portal_type is type PortalType:  either interior or exterior
     # 
 
-    # input_char_grid is a list of lists
-    # The outer list is a list of rows
-    # Each inner list is a row of characters from the input file
+    # input_char_grid is an np.array of np.arrays
+    # The outer np.array is an np.array of rows
+    # Each inner np.array is a row of characters from the input file
 
     input_char_grid = list()
 
@@ -118,14 +120,23 @@ def get_input(input_filename):
                 location_content['portal_type'] = PortalType.INTERIOR
                 dummy = 123
 
-    return portals, input_char_grid
+    return portals, np.array(input_char_grid)
     
 def get_adjacents(position, input_char_grid):
-    ret_val = {}
+    ret_val = set()
+    np_position = np.array(position)
+    for np_direction in NP_DIRECTION_ARRAY:
+        new_position = tuple(np_direction + np_position)
+
+        # NEXT ... skip if new_position isn't on the grid
+        
+        if input_char_grid[tuple(new_position)] == '.':
+            ret_val.add(new_position)
+
     return ret_val
 
 def get_portal_adjacents(portals, input_char_grid, part_number, portal_label):
-    ret_val = {}
+    ret_val = set()
     for portal_value in portals[portal_label].values():
         dummy = 123
         for position in portal_value['positions']:
@@ -140,9 +151,14 @@ def get_min_steps_needed(portals, input_char_grid, part_number):
     visited_positions = get_portal_adjacents(portals, input_char_grid, part_number, 'AA')
     latest_positions = deepcopy(visited_positions)
 
-    dummy = 123
-
     # Loop to take one step at a time using BFS (breadth first search) algorithm
+    # NOT YET COMPLETE !!!!
+    while len(latest_positions) > 0:
+        latest_positions.pop()
+
+        dummy = 123
+
+    
 
 
 
