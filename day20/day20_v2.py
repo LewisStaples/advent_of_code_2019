@@ -121,14 +121,27 @@ def get_input(input_filename):
                 dummy = 123
 
     return portals, np.array(input_char_grid)
-    
+
+def off_grid(new_position, input_char_grid):
+    if new_position[0] < 0:
+        return True
+    if new_position[1] < 0:
+        return True
+    if new_position[0] >= len(input_char_grid):
+        return True
+    if new_position[1] >= len(input_char_grid[0]):
+        return True
+    return False
+
 def get_adjacents(position, input_char_grid):
     ret_val = set()
     np_position = np.array(position)
     for np_direction in NP_DIRECTION_ARRAY:
         new_position = tuple(np_direction + np_position)
 
-        # NEXT ... skip if new_position isn't on the grid
+        # Skip if new_position isn't on the grid
+        if off_grid(new_position, input_char_grid):
+            continue
         
         if input_char_grid[tuple(new_position)] == '.':
             ret_val.add(new_position)
