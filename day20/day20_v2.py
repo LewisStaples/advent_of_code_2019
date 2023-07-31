@@ -143,7 +143,7 @@ def get_adjacents(position, input_char_grid):
         if off_grid(new_position, input_char_grid):
             continue
         
-        if input_char_grid[tuple(new_position)] == '.':
+        if (input_char_grid[tuple(new_position)] == '.') | input_char_grid[tuple(new_position)].isalpha():
             ret_val.add(new_position)
 
     return ret_val
@@ -165,9 +165,23 @@ def get_min_steps_needed(portals, input_char_grid, part_number):
     latest_positions = deepcopy(visited_positions)
 
     # Loop to take one step at a time using BFS (breadth first search) algorithm
-    # NOT YET COMPLETE !!!!
     while len(latest_positions) > 0:
-        latest_positions.pop()
+        latest_position = latest_positions.pop()
+        np_latest_position = np.array(latest_position)
+        l_p_char = input_char_grid[tuple(np_latest_position)]
+        
+        the_adjacents = None
+        # If not a portal
+        # if True:
+        if l_p_char == '.':
+            the_adjacents = get_adjacents(latest_position, input_char_grid)
+        else:
+            # NEXT ... check out all four adjacent characters, one must be the other letter, put them together in order top or left first
+            the_adjacents = get_portal_adjacents(portals, input_char_grid, part_number, 'AA')
+        for adj_position in the_adjacents:
+            if adj_position not in visited_positions:
+                visited_positions.add(adj_position)
+                latest_positions.add(adj_position)
 
         dummy = 123
 
