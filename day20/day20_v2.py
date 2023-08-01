@@ -158,7 +158,6 @@ def get_portal_adjacents(portals, input_char_grid, part_number, portal_label):
     return ret_val
 
 def get_min_steps_needed(portals, input_char_grid, part_number):
-    pass
 
     # Get initial state
     visited_positions = get_portal_adjacents(portals, input_char_grid, part_number, 'AA')
@@ -171,19 +170,28 @@ def get_min_steps_needed(portals, input_char_grid, part_number):
         l_p_char = input_char_grid[tuple(np_latest_position)]
         
         the_adjacents = None
+
         # If not a portal
-        # if True:
         if l_p_char == '.':
             the_adjacents = get_adjacents(latest_position, input_char_grid)
-        else:
+        else: # It must be a portal
+            assert(l_p_char.isalpha())
             # NEXT ... check out all four adjacent characters, one must be the other letter, put them together in order top or left first
-            the_adjacents = get_portal_adjacents(portals, input_char_grid, part_number, 'AA')
+            for next_adjacent in get_adjacents(latest_position, input_char_grid):
+                if next_adjacent in visited_positions:
+                    continue
+                next_char = input_char_grid[tuple(np.array(next_adjacent))]
+                if next_char.isalpha():
+                    this_portal_label = ''.join(sorted([next_char, l_p_char]))
+                    the_adjacents = get_portal_adjacents(portals, input_char_grid, part_number, this_portal_label)
+
+        if the_adjacents is None:
+            continue
         for adj_position in the_adjacents:
             if adj_position not in visited_positions:
                 visited_positions.add(adj_position)
                 latest_positions.add(adj_position)
 
-        dummy = 123
 
     
 
@@ -193,5 +201,7 @@ def solve_problem(input_filename):
     portals, input_char_grid = get_input(input_filename)
     min_steps_needed_part1 = get_min_steps_needed(portals, input_char_grid, 1)
     # min_steps_needed_part2 = get_min_steps_needed(portals, input_char_grid, 2)
+
+    dummy = 123
 
 solve_problem('input_sample0.txt')
