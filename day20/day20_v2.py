@@ -133,6 +133,8 @@ def off_grid(new_position, input_char_grid):
         return True
     return False
 
+# NEXT ... Add functionality for levels
+# The input and output levels are always the same
 def get_adjacents(position, input_char_grid):
     ret_val = set()
     np_position = np.array(position)
@@ -148,6 +150,11 @@ def get_adjacents(position, input_char_grid):
 
     return ret_val
 
+# NEXT ... Add functionality for levels
+# If part_number == 1, the level is always zero.  Include that in the output.
+# 
+# If part_number == 2, use the input level number and the bit whether internal or external
+# to determine its output level number
 def get_portal_adjacents(portals, input_char_grid, part_number, portal_label):
     ret_val = set()
     for portal_value in portals[portal_label].values():
@@ -176,7 +183,6 @@ def get_min_steps_needed(portals, input_char_grid, part_number):
             the_adjacents = get_adjacents(latest_position, input_char_grid)
         else: # It must be a portal
             assert(l_p_char.isalpha())
-            # NEXT ... check out all four adjacent characters, one must be the other letter, put them together in order top or left first
             for next_adjacent in get_adjacents(latest_position, input_char_grid):
                 if next_adjacent in visited_positions:
                     continue
