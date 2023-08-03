@@ -156,6 +156,11 @@ def get_adjacents(position, input_char_grid):
 # If part_number == 2, use the input level number and the bit whether internal or external
 # to determine its output level number
 def get_portal_adjacents(portals, input_char_grid, part_number, portal_label):
+    if part_number == 1:
+        level_output = 0
+    else:
+        pass
+        # level_output = level_input + diff # Internal or External
     ret_val = set()
     for portal_value in portals[portal_label].values():
         dummy = 123
