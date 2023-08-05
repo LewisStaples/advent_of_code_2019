@@ -3,6 +3,8 @@
 # adventOfCode 2019 day 22
 # https://adventofcode.com/2019/day/22
 
+import numpy as np
+
 class Command:
     def __init__(self, in_string):
         self.number_parameter = None
@@ -15,7 +17,7 @@ class Command:
 
 class Deck:
     def __init__(self, num_cards):
-        self.cards = [card_val for card_val in range(num_cards)]
+        self.cards = np.array([card_val for card_val in range(num_cards)])
 
     def display(self):
         return ' '.join([str(card) for card in self.cards])
@@ -35,11 +37,20 @@ def get_input(input_filename):
     return the_commands
 
 
+def cut(number_parameter, deck):
+    cards_left, cards_right = np.split(deck.cards, [number_parameter])
+    new_cards = np.concatenate((cards_right, cards_left))
+    deck.cards = new_cards
+
+
 def run(command, deck):
-    dummy = 123
     if command.in_string == 'deal into new stack':
-        deck.cards.reverse()
-    dummy = 123
+        # deck.cards.reverse()
+        deck.cards = np.flip(deck.cards)
+    elif command.in_string == 'cut':
+        cut(command.number_parameter, deck)
+    else:
+        raise ValueError(f'Unknown command \"{command.in_string}\"')
 
 
 def solve_problem(input_filename):
