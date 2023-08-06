@@ -38,8 +38,7 @@ def get_input(input_filename):
 
 
 def cut(number_parameter, deck):
-    cards_left, cards_right = np.split(deck.cards, [number_parameter])
-    new_cards = np.concatenate((cards_right, cards_left))
+    new_cards = np.roll(deck.cards, -1 * number_parameter)
     deck.cards = new_cards
 
 
@@ -68,5 +67,5 @@ def solve_problem(input_filename):
         run(command, deck)
     print(f'Final deck:    {deck.display()}')
 
-solve_problem('input_sample0.txt')
+solve_problem('input_sample2.txt')
 
