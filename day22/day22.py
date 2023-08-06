@@ -42,12 +42,25 @@ def cut(number_parameter, deck):
     deck.cards = new_cards
 
 
+def deal_with_increment(number_parameter, deck):
+    if number_parameter % len(deck.cards) == 0:
+        raise ValueError(f'number_parameter ({number_parameter}) is not permitted to be a multiple of the number of cards ({len(deck.cards)})')
+    # new_cards = np.roll(deck.cards, number_parameter)
+    new_cards = [None] * len(deck.cards)
+    # Part 1 has the index equal card_value (I am not betting on that being equal in Part 2)
+    for i, card_value in enumerate(deck.cards):
+        new_cards[(i * number_parameter) % len(new_cards)] = card_value
+    deck.cards = new_cards
+
+
 def run(command, deck):
     if command.in_string == 'deal into new stack':
         # deck.cards.reverse()
         deck.cards = np.flip(deck.cards)
     elif command.in_string == 'cut':
         cut(command.number_parameter, deck)
+    elif command.in_string == 'deal with increment':
+        deal_with_increment(command.number_parameter, deck)
     else:
         raise ValueError(f'Unknown command \"{command.in_string}\"')
 
@@ -67,5 +80,5 @@ def solve_problem(input_filename):
         run(command, deck)
     print(f'Final deck:    {deck.display()}')
 
-solve_problem('input_sample2.txt')
+solve_problem('input_sample7.txt')
 
