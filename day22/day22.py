@@ -20,8 +20,12 @@ class Deck:
         self.cards = np.array([card_val for card_val in range(num_cards)])
 
     def display(self):
-        return ' '.join([str(card) for card in self.cards])
-        # return text(self.cards)
+        if len(self.cards) < 75:
+            # Return the new array
+            return ' '.join([str(card) for card in self.cards])
+        else:
+            # Return the index where 2019 appears in the array
+            return np.where(self.cards == 2019)[0][0]
 
 def get_input(input_filename):
     the_commands = list()
@@ -75,10 +79,12 @@ def solve_problem(input_filename):
         # The real judged data
         deck = Deck(10007)
 
-    print(f'Initial deck:  {deck.display()}')
+    print(f'\nUsing input file (as before): {input_filename}\n')
+    print(f'Initial deck status:  {deck.display()}')
     for command in the_commands:
         run(command, deck)
-    print(f'Final deck:    {deck.display()}')
+    print(f'Final deck status:    {deck.display()}')
+    print()
 
-solve_problem('input_sample7.txt')
+solve_problem('input.txt')
 
